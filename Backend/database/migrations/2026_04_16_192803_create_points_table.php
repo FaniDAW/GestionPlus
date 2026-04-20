@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('points', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('business_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('balance')->default(0);
+            $table->unsignedInteger('total_earned')->default(0);
+            $table->unsignedInteger('total_redeemed')->default(0);
             $table->timestamps();
+
+            $table->unique(['user_id', 'business_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('points');
