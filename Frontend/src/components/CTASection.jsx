@@ -2,7 +2,7 @@ export default function CTASection() {
   return (
     <section className="py-24 bg-white">
       <div className="max-w-4xl mx-auto px-6">
-        <div className="relative bg-gradient-to-br from-violet-600 to-pink-500 rounded-3xl p-12 text-center overflow-hidden">
+        <div className="relative bg-linear-to-br from-violet-600 to-pink-500 rounded-3xl p-12 text-center overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute top-0 left-0 w-48 h-48 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2" />
@@ -37,6 +37,7 @@ export default function CTASection() {
                 Ver demo en vivo
               </a>
             </div>
+
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
               {[

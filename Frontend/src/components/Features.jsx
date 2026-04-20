@@ -60,7 +60,7 @@ export default function Features() {
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-800 mb-4">
             Todo lo que necesitas para{' '}
-            <span className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-violet-600 to-pink-500 bg-clip-text text-transparent">
               fidelizar
             </span>
           </h2>
@@ -73,7 +73,7 @@ export default function Features() {
           {features.map((f) => (
             <div
               key={f.title}
-              className={`relative bg-gradient-to-br ${f.color} rounded-3xl p-6 border border-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group`}
+              className={`relative bg-linear-to-br ${f.color} rounded-3xl p-6 border border-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group`}
             >
               {f.tag && (
                 <span className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full ${f.tag}`}>

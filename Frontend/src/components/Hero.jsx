@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-violet-50 via-white to-pink-50">
+    <section className="relative pt-32 pb-20 overflow-hidden bg-linear-to-br from-violet-50 via-white to-pink-50">
       {/* Background blobs */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-violet-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 -translate-y-1/2" />
@@ -17,7 +17,7 @@ export default function Hero() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-800 leading-tight mb-6">
               Convierte clientes{' '}
-              <span className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-violet-600 to-pink-500 bg-clip-text text-transparent">
                 ocasionales
               </span>{' '}
               en fans de tu marca
@@ -31,7 +31,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <a
                 href="#"
-                className="bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold px-8 py-4 rounded-2xl hover:shadow-xl hover:shadow-violet-200 transition-all text-center"
+                className="bg-linear-to-r from-violet-500 to-pink-500 text-white font-bold px-8 py-4 rounded-2xl hover:shadow-xl hover:shadow-violet-200 transition-all text-center"
               >
                 Empieza gratis — 14 días
               </a>
@@ -39,6 +39,7 @@ export default function Hero() {
                 href="#cómo-funciona"
                 className="flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold px-8 py-4 rounded-2xl border border-slate-200 hover:border-violet-300 hover:text-violet-600 transition-all"
               >
+
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -71,7 +72,7 @@ export default function Hero() {
                     <p className="text-xs text-slate-400 font-medium">Panel de control</p>
                     <h3 className="text-sm font-bold text-slate-700">Café La Esquina</h3>
                   </div>
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-linear-to-br from-violet-400 to-pink-400 flex items-center justify-center">
                     <span className="text-white text-xs font-bold">F</span>
                   </div>
                 </div>
