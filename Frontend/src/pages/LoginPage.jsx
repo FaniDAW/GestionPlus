@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getDashboardPath } from '../lib/roles'
 import { useState } from 'react'
 
 const schema = z.object({
@@ -24,8 +25,8 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     setServerError('')
     try {
-      await login(data.email, data.password)
-      navigate('/dashboard')
+      const result = await login(data.email, data.password)
+      navigate(getDashboardPath(result.user.role))
     } catch (err) {
       setServerError(err.response?.data?.message || 'Error al iniciar sesión. Inténtalo de nuevo.')
     }

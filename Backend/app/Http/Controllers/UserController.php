@@ -36,10 +36,11 @@ class UserController extends Controller
     public function update(Request $request, User $user): JsonResponse
     {
         $data = $request->validate([
-            'name'  => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'role'  => 'sometimes|in:admin,business_owner,customer',
+            'name'      => 'sometimes|string|max:255',
+            'email'     => 'sometimes|email|unique:users,email,' . $user->id,
+            'phone'     => 'nullable|string|max:20',
+            'role'      => 'sometimes|in:admin,business_owner,customer',
+            'is_active' => 'sometimes|boolean',
         ]);
 
         $user->update($data);
