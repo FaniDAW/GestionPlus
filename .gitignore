@@ -1,0 +1,36 @@
+# IDEs
+.idea/
+.vscode/
+.nova/
+.zed/
+.fleet/
+
+# macOS
+.DS_Store
+Thumbs.db
+
+# Backend (Laravel)
+Backend/.env
+Backend/.env.backup
+Backend/.env.production
+Backend/vendor/
+Backend/node_modules/
+Backend/public/build/
+Backend/public/hot/
+Backend/public/storage/
+Backend/storage/*.key
+Backend/storage/pail/
+Backend/auth.json
+Backend/.phpunit.cache/
+Backend/.phpunit.result.cache
+Backend/.phpactor.json
+Backend/Homestead.json
+Backend/Homestead.yaml
+
+# Frontend (React/Vite)
+Frontend/.env
+Frontend/.env.local
+Frontend/.env.*.local
+Frontend/node_modules/
+Frontend/dist/
+Frontend/dist-ssr/
