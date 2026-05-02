@@ -69,4 +69,21 @@ class User extends Authenticatable
     {
         return $this->hasMany(Invoice::class);
     }
+
+
+    // --- Helpers de rol ---
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isBusiness(): bool
+    {
+        return $this->role === 'business_owner';
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->role === 'customer';
+    }
 }
