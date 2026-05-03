@@ -1,7 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import api from '../lib/api'
 
 const plans = [
   {
+    id: 'starter',
     name: 'Starter',
     monthlyPrice: 29,
     annualPrice: 23,
@@ -19,6 +23,7 @@ const plans = [
     missing: ['Suscripciones y membresías', 'Multi-negocio', 'API acceso'],
   },
   {
+    id: 'pro',
     name: 'Pro',
     monthlyPrice: 79,
     annualPrice: 63,
@@ -38,6 +43,7 @@ const plans = [
     missing: ['Multi-negocio', 'API acceso'],
   },
   {
+    id: null,
     name: 'Enterprise',
     monthlyPrice: null,
     annualPrice: null,
@@ -58,7 +64,27 @@ const plans = [
 ]
 
 export default function Pricing() {
-  const [annual, setAnnual] = useState(false)
+  const [annual, setAnnual]         = useState(false)
+  const [loadingPlan, setLoadingPlan] = useState(false)
+  const { user } = useAuth()
+  const navigate  = useNavigate()
+
+  const handlePlanClick = async (plan) => {
+    if (!plan.id) return // Enterprise: no acción automática
+
+    if (!user) {
+      navigate('/register')
+      return
+    }
+
+    setLoadingPlan(plan.id)
+    try {
+      const res = await api.post('/stripe/checkout', { plan: plan.id })
+      window.location.href = res.data.checkout_url
+    } catch {
+      setLoadingPlan(false)
+    }
+  }
 
   return (
     <section id="precios" className="py-24 bg-white">
@@ -77,7 +103,7 @@ export default function Pricing() {
             Sin comisiones ocultas. Cancela cuando quieras.
           </p>
 
-          {/* Toggle */}
+          {/* Toggle mensual / anual */}
           <div className="inline-flex items-center gap-3 bg-slate-100 rounded-2xl p-1">
             <button
               onClick={() => setAnnual(false)}
@@ -128,12 +154,25 @@ export default function Pricing() {
                 )}
               </div>
 
-              <a
-                href="#"
-                className={`block w-full text-center font-bold py-3 rounded-2xl transition-all mb-8 ${plan.button}`}
+              <button
+                onClick={() => handlePlanClick(plan)}
+                disabled={loadingPlan === plan.id}
+                className={`w-full text-center font-bold py-3 rounded-2xl transition-all mb-8 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${plan.button}`}
               >
-                {plan.monthlyPrice ? 'Empezar prueba gratis' : 'Hablar con ventas'}
-              </a>
+                {loadingPlan === plan.id ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Redirigiendo...
+                  </>
+                ) : plan.monthlyPrice ? (
+                  user ? 'Suscribirse ahora' : 'Empezar prueba gratis'
+                ) : (
+                  'Hablar con ventas'
+                )}
+              </button>
 
               <ul className="space-y-3">
                 {plan.features.map((f) => (

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -59,7 +60,7 @@ class StripeController extends Controller
                 'user_id' => $user->id,
                 'plan'    => $data['plan'],
             ],
-            'success_url' => config('app.frontend_url') . '/dashboard?session_id={CHECKOUT_SESSION_ID}',
+            'success_url' => config('app.frontend_url') . '/business/dashboard?welcome=1',
             'cancel_url'  => config('app.frontend_url') . '/register?cancelled=1',
         ]);
 
@@ -87,19 +88,35 @@ class StripeController extends Controller
 
             if ($userId && $plan && isset($this->plans[$plan])) {
                 $planData = $this->plans[$plan];
+                $user     = User::find($userId);
 
-                Subscription::updateOrCreate(
-                    ['business_id' => User::find($userId)?->businesses()->first()?->id],
-                    [
-                        'plan_name'        => $planData['name'],
-                        'price'            => $planData['price'] / 100,
-                        'billing_cycle'    => $planData['billing_cycle'],
-                        'status'           => 'active',
-                        'starts_at'        => now(),
-                        'ends_at'          => now()->addMonth(),
-                        'stripe_session_id' => $session['id'],
-                    ]
-                );
+                if ($user) {
+                    // Promover a business_owner
+                    $user->update(['role' => 'business_owner']);
+
+                    // Crear negocio si no tiene uno
+                    $business = $user->businesses()->first()
+                        ?? Business::create([
+                            'owner_id'  => $user->id,
+                            'name'      => 'Negocio de ' . $user->name,
+                            'email'     => $user->email,
+                            'is_active' => true,
+                        ]);
+
+                    // Crear o actualizar suscripción
+                    Subscription::updateOrCreate(
+                        ['business_id' => $business->id],
+                        [
+                            'plan_name'         => $planData['name'],
+                            'price'             => $planData['price'] / 100,
+                            'billing_cycle'     => $planData['billing_cycle'],
+                            'status'            => 'active',
+                            'starts_at'         => now(),
+                            'ends_at'           => now()->addMonth(),
+                            'stripe_session_id' => $session['id'],
+                        ]
+                    );
+                }
             }
         }
 

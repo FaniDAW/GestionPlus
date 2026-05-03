@@ -15,6 +15,12 @@ class RewardController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        if ($request->user()->role === 'business_owner') {
+            $request->merge([
+                'business_id' => $request->user()->businesses()->first()?->id,
+            ]);
+        }
+
         $data = $request->validate([
             'business_id'     => 'required|exists:businesses,id',
             'name'            => 'required|string|max:255',

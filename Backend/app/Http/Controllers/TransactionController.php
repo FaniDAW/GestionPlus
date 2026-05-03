@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Transaction::with(['user', 'business', 'invoice'])->get());
+        $query = Transaction::with(['user', 'business', 'invoice']);
+
+        if ($request->user()->role === 'business_owner') {
+            $businessId = $request->user()->businesses()->first()?->id;
+            $query->where('business_id', $businessId);
+        }
+
+        return response()->json($query->latest()->get());
     }
 
     public function store(Request $request): JsonResponse

@@ -12,7 +12,10 @@ import Footer from './components/Footer'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
-import BusinessDashboard from './pages/BusinessDashboard'
+import BusinessLayout from './pages/business/BusinessLayout'
+import BusinessOverview from './pages/business/BusinessOverview'
+import BusinessRewards from './pages/business/BusinessRewards'
+import BusinessTransactions from './pages/business/BusinessTransactions'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminOverview from './pages/admin/AdminOverview'
 import AdminBusinesses from './pages/admin/AdminBusinesses'
@@ -81,9 +84,14 @@ function AppRoutes() {
       } />
 
       {/* Business owner */}
-      <Route path="/business/dashboard" element={
-        <RoleRoute roles={['business_owner']}><BusinessDashboard /></RoleRoute>
-      } />
+      <Route path="/business" element={
+        <RoleRoute roles={['business_owner']}><BusinessLayout /></RoleRoute>
+      }>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard"    element={<BusinessOverview />} />
+        <Route path="rewards"      element={<BusinessRewards />} />
+        <Route path="transactions" element={<BusinessTransactions />} />
+      </Route>
 
       {/* Admin — layout con sidebar, subrutas como Outlet */}
       <Route path="/admin" element={

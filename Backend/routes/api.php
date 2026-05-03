@@ -21,8 +21,9 @@ Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
 
 // Rutas protegidas — cualquier usuario autenticado
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me',      [AuthController::class, 'me']);
+    Route::post('/logout',      [AuthController::class, 'logout']);
+    Route::get('/me',           [AuthController::class, 'me']);
+    Route::get('/my-business',  [BusinessController::class, 'myBusiness']);
     Route::post('/stripe/checkout', [StripeController::class, 'createCheckoutSession']);
     Route::apiResource('businesses', BusinessController::class);
     Route::apiResource('transactions', TransactionController::class);

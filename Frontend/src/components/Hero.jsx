@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Hero() {
   return (
     <section className="relative pt-32 pb-20 overflow-hidden bg-linear-to-br from-violet-50 via-white to-pink-50">
@@ -29,12 +31,12 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <a
-                href="#"
+              <Link
+                to="/register"
                 className="bg-linear-to-r from-violet-500 to-pink-500 text-white font-bold px-8 py-4 rounded-2xl hover:shadow-xl hover:shadow-violet-200 transition-all text-center"
               >
                 Empieza gratis — 14 días
-              </a>
+              </Link>
               <a
                 href="#cómo-funciona"
                 className="flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold px-8 py-4 rounded-2xl border border-slate-200 hover:border-violet-300 hover:text-violet-600 transition-all"

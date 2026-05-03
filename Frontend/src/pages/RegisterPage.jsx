@@ -125,7 +125,6 @@ export default function RegisterPage() {
         phone:    data.phone || undefined,
         password: data.password,
         password_confirmation: data.password_confirmation,
-        role:     'business_owner',
       })
 
       setLoadingCheckout(true)

@@ -1,25 +1,32 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { getDashboardPath } from '../lib/roles'
+
+const sections = ['Características', 'Cómo funciona', 'Precios', 'Testimonios']
+const sectionHref = (label) => `#${label.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-')}`
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const { user } = useAuth()
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-violet-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">F</span>
+            <span className="text-white font-bold text-sm">G</span>
           </div>
           <span className="text-xl font-bold text-violet-800">Gestion+</span>
-        </a>
+        </Link>
 
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8">
-          {['Características', 'Cómo funciona', 'Precios', 'Testimonios'].map((item) => (
+          {sections.map((item) => (
             <a
               key={item}
-              href={`#${item.toLowerCase().replace(' ', '-')}`}
+              href={sectionHref(item)}
               className="text-sm text-slate-600 hover:text-violet-600 transition-colors font-medium"
             >
               {item}
@@ -27,17 +34,28 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* CTA desktop */}
         <div className="hidden md:flex items-center gap-3">
-          <a href="#" className="text-sm text-slate-600 hover:text-violet-600 font-medium transition-colors">
-            Iniciar sesión
-          </a>
-          <a
-            href="#"
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all"
-          >
-            Empieza gratis
-          </a>
+          {user ? (
+            <Link
+              to={getDashboardPath(user.role)}
+              className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all"
+            >
+              Mi panel
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="text-sm text-slate-600 hover:text-violet-600 font-medium transition-colors">
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/register"
+                className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all"
+              >
+                Empieza gratis
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -57,22 +75,42 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white border-t border-violet-100 px-6 py-4 flex flex-col gap-4">
-          {['Características', 'Cómo funciona', 'Precios', 'Testimonios'].map((item) => (
+          {sections.map((item) => (
             <a
               key={item}
-              href="#"
+              href={sectionHref(item)}
               onClick={() => setOpen(false)}
               className="text-sm text-slate-600 hover:text-violet-600 font-medium"
             >
               {item}
             </a>
           ))}
-          <a
-            href="#"
-            className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center"
-          >
-            Empieza gratis
-          </a>
+          {user ? (
+            <Link
+              to={getDashboardPath(user.role)}
+              onClick={() => setOpen(false)}
+              className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center"
+            >
+              Mi panel
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                className="text-sm text-slate-600 hover:text-violet-600 font-medium"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setOpen(false)}
+                className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center"
+              >
+                Empieza gratis
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>

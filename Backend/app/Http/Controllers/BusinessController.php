@@ -13,6 +13,24 @@ class BusinessController extends Controller
         return response()->json(Business::with('owner')->get());
     }
 
+    public function myBusiness(Request $request): JsonResponse
+    {
+        $business = $request->user()->businesses()->first();
+
+        if (! $business) {
+            return response()->json(['message' => 'No tienes un negocio registrado.'], 404);
+        }
+
+        $stats = [
+            'total_customers'       => $business->points()->distinct('user_id')->count('user_id'),
+            'total_points_issued'   => (int) $business->points()->sum('total_earned'),
+            'total_points_redeemed' => (int) $business->points()->sum('total_redeemed'),
+            'active_rewards'        => $business->rewards()->where('is_active', true)->count(),
+        ];
+
+        return response()->json(array_merge($business->toArray(), ['stats' => $stats]));
+    }
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([

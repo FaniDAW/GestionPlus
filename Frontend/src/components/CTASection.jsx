@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function CTASection() {
   return (
     <section className="py-24 bg-white">
@@ -24,20 +26,19 @@ export default function CTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#"
+              <Link
+                to="/register"
                 className="bg-white text-violet-700 font-bold px-8 py-4 rounded-2xl hover:shadow-2xl transition-all"
               >
                 Crear mi cuenta gratis
-              </a>
+              </Link>
               <a
-                href="#"
+                href="#como-funciona"
                 className="border-2 border-white/50 text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white/10 transition-all"
               >
                 Ver demo en vivo
               </a>
             </div>
-
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
               {[

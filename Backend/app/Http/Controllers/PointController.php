@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 
 class PointController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Point::with(['user', 'business'])->get());
+        $query = Point::with(['user', 'business']);
+
+        if ($request->user()->role === 'business_owner') {
+            $businessId = $request->user()->businesses()->first()?->id;
+            $query->where('business_id', $businessId);
+        }
+
+        return response()->json($query->get());
     }
 
     public function store(Request $request): JsonResponse
