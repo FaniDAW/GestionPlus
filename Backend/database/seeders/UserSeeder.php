@@ -39,5 +39,28 @@ class UserSeeder extends Seeder
                 'role'     => 'customer',
             ]
         );
+
+        $group = \App\Models\Group::firstOrCreate(
+            ['name' => 'Asociación de Comerciantes Demo'],
+            [
+                'type'          => 'association',
+                'contact_email' => 'asociacion@demo.com',
+                'contact_phone' => '600000010',
+                'address'       => 'Calle Mayor 1, Demo',
+                'is_active'     => true,
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'asociacion@demo.com'],
+            [
+                'name'      => 'Admin Asociación',
+                'password'  => Hash::make('Test1234'),
+                'phone'     => '600000010',
+                'role'      => 'association_admin',
+                'is_active' => true,
+                'group_id'  => $group->id,
+            ]
+        );
     }
 }
