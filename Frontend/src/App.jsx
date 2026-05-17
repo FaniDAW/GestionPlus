@@ -12,15 +12,25 @@ import Footer from './components/Footer'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
+
 import BusinessLayout from './pages/business/BusinessLayout'
 import BusinessOverview from './pages/business/BusinessOverview'
 import BusinessRewards from './pages/business/BusinessRewards'
 import BusinessTransactions from './pages/business/BusinessTransactions'
+import BusinessOffers from './pages/business/BusinessOffers'
+
+import AssociationLayout from './pages/association/AssociationLayout'
+import AssociationOverview from './pages/association/AssociationOverview'
+import AssociationBusinesses from './pages/association/AssociationBusinesses'
+import AssociationOffers from './pages/association/AssociationOffers'
+
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminOverview from './pages/admin/AdminOverview'
 import AdminBusinesses from './pages/admin/AdminBusinesses'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminSubscriptions from './pages/admin/AdminSubscriptions'
+import AdminGroups from './pages/admin/AdminGroups'
+import AdminOffers from './pages/admin/AdminOffers'
 
 function Spinner() {
   return (
@@ -47,21 +57,18 @@ function LandingPage() {
   )
 }
 
-// Redirige a login si no autenticado
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <Spinner />
   return user ? children : <Navigate to="/login" replace />
 }
 
-// Redirige al dashboard del rol si ya está autenticado
 function GuestRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <Spinner />
   return user ? <Navigate to={getDashboardPath(user.role)} replace /> : children
 }
 
-// Protege por rol: redirige al dashboard del rol si no tiene permiso
 function RoleRoute({ children, roles }) {
   const { user, loading } = useAuth()
   if (loading) return <Spinner />
@@ -91,17 +98,30 @@ function AppRoutes() {
         <Route path="dashboard"    element={<BusinessOverview />} />
         <Route path="rewards"      element={<BusinessRewards />} />
         <Route path="transactions" element={<BusinessTransactions />} />
+        <Route path="offers"       element={<BusinessOffers />} />
       </Route>
 
-      {/* Admin — layout con sidebar, subrutas como Outlet */}
+      {/* Association admin */}
+      <Route path="/association" element={
+        <RoleRoute roles={['association_admin']}><AssociationLayout /></RoleRoute>
+      }>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard"  element={<AssociationOverview />} />
+        <Route path="businesses" element={<AssociationBusinesses />} />
+        <Route path="offers"     element={<AssociationOffers />} />
+      </Route>
+
+      {/* Admin */}
       <Route path="/admin" element={
         <RoleRoute roles={['admin']}><AdminLayout /></RoleRoute>
       }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard"     element={<AdminOverview />} />
-        <Route path="businesses"   element={<AdminBusinesses />} />
-        <Route path="users"        element={<AdminUsers />} />
+        <Route path="businesses"    element={<AdminBusinesses />} />
+        <Route path="users"         element={<AdminUsers />} />
         <Route path="subscriptions" element={<AdminSubscriptions />} />
+        <Route path="groups"        element={<AdminGroups />} />
+        <Route path="offers"        element={<AdminOffers />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
