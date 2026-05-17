@@ -17,10 +17,13 @@ class Group extends Model
         'contact_phone',
         'address',
         'is_active',
+        'max_businesses',
+        'invitation_token',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'       => 'boolean',
+        'max_businesses'  => 'integer',
     ];
 
     public function businesses()

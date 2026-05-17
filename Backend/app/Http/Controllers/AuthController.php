@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
+use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,20 +17,66 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
-            'phone'    => 'nullable|string|max:20',
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|unique:users,email',
+            'password'         => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()],
+            'phone'            => 'nullable|string|max:20',
+            'invitation_token' => 'nullable|string',
+            'plan'             => 'nullable|string|in:individual,association_s,association_m,municipal',
+            'business_name'    => 'nullable|string|max:255',
         ]);
+
+        $group = null;
+        $role  = 'customer';
+
+        if (! empty($data['invitation_token'])) {
+            $group = Group::where('invitation_token', $data['invitation_token'])->first();
+
+            if (! $group) {
+                return response()->json([
+                    'message' => 'El enlace de invitación no es válido o ha expirado.',
+                ], 422);
+            }
+
+            if ($group->max_businesses !== null && $group->businesses()->count() >= $group->max_businesses) {
+                return response()->json([
+                    'message' => 'La asociación ha alcanzado el límite de negocios de su plan.',
+                ], 422);
+            }
+
+            $role = 'business_owner';
+        } elseif (! empty($data['plan'])) {
+            $role = 'business_owner';
+        }
 
         $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
             'phone'    => $data['phone'] ?? null,
-            'role'     => 'customer',
+            'role'     => $role,
             'qr_code'  => Str::uuid()->toString(),
         ]);
+
+        $businessName = ! empty($data['business_name']) ? $data['business_name'] : $data['name'];
+
+        if ($group) {
+            $business = Business::create([
+                'name'      => $businessName,
+                'email'     => $data['email'],
+                'owner_id'  => $user->id,
+                'is_active' => true,
+            ]);
+
+            $group->businesses()->attach($business->id);
+        } elseif (! empty($data['plan'])) {
+            Business::create([
+                'name'      => $businessName,
+                'email'     => $data['email'],
+                'owner_id'  => $user->id,
+                'is_active' => false,
+            ]);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

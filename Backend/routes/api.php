@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
+// Resolución de token de invitación (pública)
+Route::get('/invitation/{token}', [GroupController::class, 'resolveInvitation']);
+
 // Webhook de Stripe (sin auth, con firma)
 Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
 
@@ -49,7 +52,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
 // Solo association_admin
 Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function () {
-    Route::get('/my-group',   [GroupController::class, 'myGroup']);
+    Route::get('/my-group',                        [GroupController::class, 'myGroup']);
+    Route::get('/my-group/available-businesses',   [GroupController::class, 'availableBusinesses']);
+    Route::post('/my-group/businesses',            [GroupController::class, 'myGroupAddBusiness']);
+    Route::post('/my-group/invitation',            [GroupController::class, 'generateInvitation']);
     Route::get('/points',     [PointController::class, 'index']);
     Route::get('/transactions', [TransactionController::class, 'index']);
 });

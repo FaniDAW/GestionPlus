@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getDashboardPath } from '../lib/roles'
 import api from '../lib/api'
 
 const plans = [
@@ -55,6 +56,7 @@ const schema = z.object({
     .regex(/[a-z]/, 'Debe contener al menos una minúscula')
     .regex(/[0-9]/, 'Debe contener al menos un número'),
   password_confirmation: z.string().min(1, 'Confirma tu contraseña'),
+  business_name:    z.string().min(2, 'El nombre del negocio debe tener al menos 2 caracteres').optional(),
   terms:            z.boolean().refine((v) => v === true, 'Debes aceptar los términos'),
 }).refine((d) => d.password === d.password_confirmation, {
   message: 'Las contraseñas no coinciden',
@@ -86,10 +88,38 @@ function InputField({ label, error, children }) {
 export default function RegisterPage() {
   const { register: authRegister } = useAuth()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const invitationToken = searchParams.get('token')
+  const plan            = searchParams.get('plan')
+  const isBusiness      = !!invitationToken || plan === 'individual'
+
+  const pageTitle = invitationToken
+    ? 'Únete a la asociación'
+    : plan === 'individual'
+    ? 'Registra tu negocio'
+    : 'Crea tu cuenta gratis'
+
+  const pageSubtitle = invitationToken
+    ? 'Completa tu registro para acceder al panel de tu negocio.'
+    : plan === 'individual'
+    ? '14 días de prueba. Sin tarjeta de crédito.'
+    : 'Acumula puntos en tus negocios favoritos.'
+
   const [step, setStep]             = useState(1)
   const [selectedPlan, setSelectedPlan] = useState('individual')
   const [serverError, setServerError]   = useState('')
   const [loadingCheckout, setLoadingCheckout] = useState(false)
+
+  // Invitation flow state
+  const [groupInfo, setGroupInfo]   = useState(null)
+  const [tokenError, setTokenError] = useState('')
+
+  useEffect(() => {
+    if (!invitationToken) return
+    api.get(`/invitation/${invitationToken}`)
+      .then((res) => setGroupInfo(res.data))
+      .catch(() => setTokenError('El enlace de invitación no es válido o ha expirado.'))
+  }, [invitationToken])
 
   const {
     register,
@@ -115,24 +145,46 @@ export default function RegisterPage() {
   const strengthColor = ['', 'bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-emerald-400', 'bg-emerald-500']
 
   const goToStep2 = async () => {
-    const ok = await trigger(['name', 'email', 'phone', 'password', 'password_confirmation', 'terms'])
+    const fields = ['name', 'email', 'phone', 'password', 'password_confirmation', 'terms']
+    if (isBusiness) fields.push('business_name')
+    const ok = await trigger(fields)
     if (ok) setStep(2)
   }
 
   const onSubmit = async (data) => {
     setServerError('')
     try {
-      await authRegister({
-        name:     data.name,
-        email:    data.email,
-        phone:    data.phone || undefined,
-        password: data.password,
+      const payload = {
+        name:                  data.name,
+        email:                 data.email,
+        phone:                 data.phone || undefined,
+        password:              data.password,
         password_confirmation: data.password_confirmation,
-      })
+      }
 
-      setLoadingCheckout(true)
-      const res = await api.post('/stripe/checkout', { plan: selectedPlan })
-      window.location.href = res.data.checkout_url
+      // Flow 1: invitation token
+      if (invitationToken) {
+        payload.invitation_token = invitationToken
+        payload.business_name    = data.business_name
+        const userData = await authRegister(payload)
+        navigate(getDashboardPath(userData.user.role))
+        return
+      }
+
+      // Flow 2: individual business plan
+      if (plan === 'individual') {
+        payload.plan          = selectedPlan
+        payload.business_name = data.business_name
+        await authRegister(payload)
+        setLoadingCheckout(true)
+        const res = await api.post('/stripe/checkout', { plan: selectedPlan })
+        window.location.href = res.data.checkout_url
+        return
+      }
+
+      // Flow 3: customer (no params)
+      const userData = await authRegister(payload)
+      navigate(getDashboardPath(userData.user.role))
     } catch (err) {
       setServerError(err.response?.data?.message || 'Error al crear la cuenta. Inténtalo de nuevo.')
       setStep(1)
@@ -161,12 +213,40 @@ export default function RegisterPage() {
             </div>
             <span className="text-2xl font-black text-violet-800">Gestion+</span>
           </Link>
-          <h1 className="mt-6 text-2xl font-extrabold text-slate-800">Crea tu cuenta gratis</h1>
-          <p className="text-slate-500 mt-1 text-sm">14 días de prueba. Sin tarjeta de crédito.</p>
+          <h1 className="mt-6 text-2xl font-extrabold text-slate-800">{pageTitle}</h1>
+          <p className="text-slate-500 mt-1 text-sm">{pageSubtitle}</p>
         </div>
 
-        {/* Step indicator */}
-        <div className="flex items-center justify-center gap-3 mb-8">
+        {/* Banner de invitación */}
+        {tokenError && (
+          <div className="mb-6 flex items-center gap-3 bg-red-50 text-red-700 border border-red-100 rounded-2xl px-4 py-3 text-sm">
+            <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            {tokenError}
+          </div>
+        )}
+        {groupInfo && (
+          <div className="mb-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl px-5 py-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-extrabold text-emerald-800">
+                Invitación de {groupInfo.group_name}
+              </p>
+              <p className="text-xs text-emerald-700 mt-0.5">
+                Completa tu registro para acceder al panel de tu negocio dentro de la asociación.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Step indicator — solo flujo individual */}
+        <div className={`flex items-center justify-center gap-3 mb-8 ${plan === 'individual' ? '' : 'hidden'}`}>
           {[1, 2].map((s) => (
             <div key={s} className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
@@ -223,6 +303,18 @@ export default function RegisterPage() {
                     />
                   </InputField>
                 </div>
+
+                {isBusiness && (
+                  <InputField label="Nombre del negocio" error={errors.business_name}>
+                    <input
+                      type="text"
+                      placeholder="Café La Esquina"
+                      autoComplete="organization"
+                      {...register('business_name')}
+                      className={inputClass(errors.business_name)}
+                    />
+                  </InputField>
+                )}
 
                 <InputField label="Email" error={errors.email}>
                   <input
@@ -289,16 +381,48 @@ export default function RegisterPage() {
                   <FieldError message={errors.terms?.message} />
                 </div>
 
-                <button
-                  type="button"
-                  onClick={goToStep2}
-                  className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all flex items-center justify-center gap-2"
-                >
-                  Continuar — elegir plan
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                {plan === 'individual' ? (
+                  <button
+                    type="button"
+                    onClick={goToStep2}
+                    className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all flex items-center justify-center gap-2"
+                  >
+                    Continuar — elegir plan
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || loadingCheckout}
+                    className="w-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold py-3.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Creando cuenta...
+                      </>
+                    ) : invitationToken ? (
+                      <>
+                        Crear mi cuenta
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </>
+                    ) : (
+                      <>
+                        Crear mi cuenta gratis
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             )}
 
