@@ -29,6 +29,11 @@ class Business extends Model
         return $this->belongsTo(User::class, 'owner_id');
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_business');
+    }
+
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);

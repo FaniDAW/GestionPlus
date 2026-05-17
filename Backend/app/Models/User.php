@@ -26,6 +26,7 @@ class User extends Authenticatable
         'phone',
         'role',
         'is_active',
+        'group_id',
     ];
 
     /**
@@ -62,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(Point::class);
     }
 
+    public function groupPoints()
+    {
+        return $this->hasMany(GroupPoint::class);
+    }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
@@ -72,6 +78,10 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class);
     }
 
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
 
     // --- Helpers de rol ---
     public function isAdmin(): bool
@@ -87,5 +97,10 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->role === 'customer';
+    }
+
+    public function isAssociationAdmin(): bool
+    {
+        return $this->role === 'association_admin';
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
+use App\Models\GroupPoint;
 use App\Models\Point;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,10 +12,20 @@ class PointController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $user = $request->user();
+
+        if ($user->role === 'association_admin') {
+            $points = GroupPoint::with(['user', 'group'])
+                ->where('group_id', $user->group_id)
+                ->get();
+
+            return response()->json($points);
+        }
+
         $query = Point::with(['user', 'business']);
 
-        if ($request->user()->role === 'business_owner') {
-            $businessId = $request->user()->businesses()->first()?->id;
+        if ($user->role === 'business_owner') {
+            $businessId = $user->businesses()->first()?->id;
             $query->where('business_id', $businessId);
         }
 
@@ -25,14 +37,60 @@ class PointController extends Controller
         $data = $request->validate([
             'user_id'        => 'required|exists:users,id',
             'business_id'    => 'required|exists:businesses,id',
-            'balance'        => 'integer|min:0',
-            'total_earned'   => 'integer|min:0',
-            'total_redeemed' => 'integer|min:0',
+            'points'         => 'required|integer|min:1',
+            'type'           => 'required|in:earn,redeem',
         ]);
 
-        $point = Point::create($data);
+        $business = Business::find($data['business_id']);
+        $group    = $business->groups()->first();
 
-        return response()->json($point, 201);
+        if ($group) {
+            return $this->handleGroupPoints($data, $group);
+        }
+
+        return $this->handleIndividualPoints($data);
+    }
+
+    private function handleGroupPoints(array $data, $group): JsonResponse
+    {
+        $groupPoint = GroupPoint::firstOrCreate(
+            ['user_id' => $data['user_id'], 'group_id' => $group->id],
+            ['balance' => 0, 'total_earned' => 0, 'total_redeemed' => 0]
+        );
+
+        if ($data['type'] === 'earn') {
+            $groupPoint->increment('balance', $data['points']);
+            $groupPoint->increment('total_earned', $data['points']);
+        } else {
+            if ($groupPoint->balance < $data['points']) {
+                return response()->json(['message' => 'Saldo de puntos insuficiente.'], 422);
+            }
+            $groupPoint->decrement('balance', $data['points']);
+            $groupPoint->increment('total_redeemed', $data['points']);
+        }
+
+        return response()->json($groupPoint->load(['user', 'group']), 201);
+    }
+
+    private function handleIndividualPoints(array $data): JsonResponse
+    {
+        $point = Point::firstOrCreate(
+            ['user_id' => $data['user_id'], 'business_id' => $data['business_id']],
+            ['balance' => 0, 'total_earned' => 0, 'total_redeemed' => 0]
+        );
+
+        if ($data['type'] === 'earn') {
+            $point->increment('balance', $data['points']);
+            $point->increment('total_earned', $data['points']);
+        } else {
+            if ($point->balance < $data['points']) {
+                return response()->json(['message' => 'Saldo de puntos insuficiente.'], 422);
+            }
+            $point->decrement('balance', $data['points']);
+            $point->increment('total_redeemed', $data['points']);
+        }
+
+        return response()->json($point->load(['user', 'business']), 201);
     }
 
     public function show(Point $point): JsonResponse
