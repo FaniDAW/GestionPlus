@@ -264,7 +264,10 @@ export default function Pricing() {
 
   const handleCta = async (plan) => {
     if (!plan.id) { navigate('/contact'); return }
-    if (!user)    { navigate('/register'); return }
+    if (!user) {
+      navigate(plan.id === 'individual' ? '/register?plan=individual' : '/register')
+      return
+    }
 
     setLoadingPlan(plan.id)
     try {

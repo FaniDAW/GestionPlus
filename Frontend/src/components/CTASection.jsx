@@ -27,17 +27,17 @@ export default function CTASection() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/register"
+                to="/register?plan=individual"
                 className="bg-white text-violet-700 font-bold px-8 py-4 rounded-2xl hover:shadow-2xl transition-all"
               >
-                Crear mi cuenta gratis
+                Registrar mi negocio
               </Link>
-              <button
-                onClick={() => document.getElementById('cómo-funciona')?.scrollIntoView({ behavior: 'smooth' })}
+              <Link
+                to="/register"
                 className="border-2 border-white/50 text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white/10 transition-all"
               >
-                Ver demo en vivo
-              </button>
+                Soy cliente, quiero puntos
+              </Link>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
