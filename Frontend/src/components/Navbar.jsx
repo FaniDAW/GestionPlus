@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getDashboardPath } from '../lib/roles'
 
-const sections = ['Características', 'Cómo funciona', 'Precios', 'Testimonios']
-const sectionHref = (label) => `#${label.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-')}`
+const sections = [
+  { label: 'Características', id: 'características' },
+  { label: 'Cómo funciona',   id: 'cómo-funciona' },
+  { label: 'Precios',         id: 'precios' },
+  { label: 'Testimonios',     id: 'testimonios' },
+]
+
+const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -24,13 +30,13 @@ export default function Navbar() {
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8">
           {sections.map((item) => (
-            <a
-              key={item}
-              href={sectionHref(item)}
+            <button
+              key={item.id}
+              onClick={() => scrollTo(item.id)}
               className="text-sm text-slate-600 hover:text-violet-600 transition-colors font-medium"
             >
-              {item}
-            </a>
+              {item.label}
+            </button>
           ))}
         </div>
 
@@ -76,14 +82,13 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden bg-white border-t border-violet-100 px-6 py-4 flex flex-col gap-4">
           {sections.map((item) => (
-            <a
-              key={item}
-              href={sectionHref(item)}
-              onClick={() => setOpen(false)}
-              className="text-sm text-slate-600 hover:text-violet-600 font-medium"
+            <button
+              key={item.id}
+              onClick={() => { scrollTo(item.id); setOpen(false) }}
+              className="text-sm text-slate-600 hover:text-violet-600 font-medium text-left"
             >
-              {item}
-            </a>
+              {item.label}
+            </button>
           ))}
           {user ? (
             <Link
