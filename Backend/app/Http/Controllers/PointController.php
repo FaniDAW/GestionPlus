@@ -22,14 +22,26 @@ class PointController extends Controller
             return response()->json($points);
         }
 
-        $query = Point::with(['user', 'business']);
-
         if ($user->role === 'business_owner') {
-            $businessId = $user->businesses()->first()?->id;
-            $query->where('business_id', $businessId);
+            $business = $user->businesses()->first();
+            $group    = $business?->groups()->first();
+
+            if ($group) {
+                return response()->json(
+                    GroupPoint::with(['user', 'group'])
+                        ->where('group_id', $group->id)
+                        ->get()
+                );
+            }
+
+            return response()->json(
+                Point::with(['user', 'business'])
+                    ->where('business_id', $business?->id)
+                    ->get()
+            );
         }
 
-        return response()->json($query->get());
+        return response()->json(Point::with(['user', 'business'])->get());
     }
 
     public function store(Request $request): JsonResponse

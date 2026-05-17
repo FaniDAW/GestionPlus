@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\Group;
+use App\Models\GroupPoint;
+use App\Models\Point;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -117,6 +119,33 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json($request->user()->load('businesses'));
+        $user = $request->user()->load('businesses');
+
+        $individual = Point::with('business')
+            ->where('user_id', $user->id)
+            ->get()
+            ->map(fn($p) => [
+                'type'           => 'individual',
+                'name'           => $p->business?->name ?? '',
+                'balance'        => $p->balance,
+                'total_earned'   => $p->total_earned,
+                'total_redeemed' => $p->total_redeemed,
+            ]);
+
+        $group = GroupPoint::with('group')
+            ->where('user_id', $user->id)
+            ->get()
+            ->map(fn($p) => [
+                'type'           => 'group',
+                'name'           => $p->group?->name ?? '',
+                'balance'        => $p->balance,
+                'total_earned'   => $p->total_earned,
+                'total_redeemed' => $p->total_redeemed,
+            ]);
+
+        return response()->json(array_merge($user->toArray(), [
+            'points'        => $individual->toBase()->merge($group->toBase())->values(),
+            'total_balance' => $individual->sum('balance') + $group->sum('balance'),
+        ]));
     }
 }

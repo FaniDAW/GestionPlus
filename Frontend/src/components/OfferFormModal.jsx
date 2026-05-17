@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 const DISCOUNT_TYPES = [
   { value: 'percentage',        label: 'Porcentaje (%)' },
@@ -6,7 +7,14 @@ const DISCOUNT_TYPES = [
   { value: 'points_multiplier', label: 'Multiplicador de puntos' },
 ]
 
+const roleToScope = {
+  business_owner:    'individual',
+  association_admin: 'group',
+  admin:             'global',
+}
+
 export default function OfferFormModal({ offer, onSave, onClose }) {
+  const { user } = useAuth()
   const [form, setForm] = useState({
     title:          '',
     description:    '',
@@ -40,8 +48,9 @@ export default function OfferFormModal({ offer, onSave, onClose }) {
     e.preventDefault()
     setSaving(true)
     setError(null)
+    const scope = roleToScope[user?.role] ?? 'individual'
     try {
-      await onSave(form)
+      await onSave({ ...form, scope })
     } catch (err) {
       setError(err.response?.data?.message ?? 'Error al guardar la oferta.')
     } finally {

@@ -50,17 +50,29 @@ function PointCard({ item }) {
   )
 }
 
+const SCOPE_BADGE = {
+  individual: { label: '⭐ Solo para ti',  cls: 'bg-violet-100 text-violet-700' },
+  group:      { label: '🏘️ Red comercial', cls: 'bg-emerald-100 text-emerald-700' },
+  global:     { label: '🌐 Plataforma',    cls: 'bg-blue-100 text-blue-700' },
+}
+
 function OfferCard({ offer }) {
+  const badge = SCOPE_BADGE[offer.scope] ?? SCOPE_BADGE.individual
   return (
-    <div className="bg-white rounded-2xl border border-pink-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md hover:border-pink-200 transition-all">
-      <div className="flex items-start justify-between gap-3">
+    <div className="relative bg-white rounded-2xl border border-pink-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md hover:border-pink-200 transition-all">
+      {/* Scope badge — esquina superior derecha */}
+      <span className={`absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${badge.cls}`}>
+        {badge.label}
+      </span>
+
+      <div className="flex items-start gap-3 pr-28">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center shrink-0 shadow-sm shadow-pink-100">
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
           </svg>
         </div>
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-pink-50 text-pink-600 shrink-0">
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-pink-50 text-pink-600 shrink-0 self-center">
           {discountLabel(offer)}
         </span>
       </div>
@@ -169,21 +181,57 @@ function QrSection() {
   )
 }
 
+function RewardCard({ reward }) {
+  return (
+    <div className="bg-white rounded-2xl border border-violet-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md hover:border-violet-200 transition-all">
+      <div className="flex items-start justify-between gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center shrink-0 shadow-sm shadow-violet-100">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+        </div>
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-violet-50 text-violet-600 shrink-0">
+          {reward.points_required} pts
+        </span>
+      </div>
+      <div>
+        <p className="font-bold text-slate-800 leading-snug">{reward.name}</p>
+        {reward.description && (
+          <p className="text-xs text-slate-400 mt-1 line-clamp-2">{reward.description}</p>
+        )}
+      </div>
+      <div className="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-50">
+        <span>{reward.business?.name ?? ''}</span>
+        {reward.expires_at && (
+          <span>Hasta {new Date(reward.expires_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
-  const [points, setPoints]   = useState(null)
-  const [offers, setOffers]   = useState([])
-  const [loading, setLoading] = useState(true)
+  const [points, setPoints]     = useState(null)
+  const [offers, setOffers]     = useState([])
+  const [rewards, setRewards]   = useState([])
+  const [loading, setLoading]   = useState(true)
 
   useEffect(() => {
     Promise.all([
-      api.get('/my-points'),
+      api.get('/me'),
       api.get('/offers'),
+      api.get('/rewards'),
     ])
-      .then(([ptRes, ofRes]) => {
-        setPoints(ptRes.data)
+      .then(([meRes, ofRes, rwRes]) => {
+        setPoints({
+          points:        meRes.data.points        ?? [],
+          total_balance: meRes.data.total_balance ?? 0,
+        })
         setOffers(ofRes.data)
+        setRewards(rwRes.data)
       })
       .finally(() => setLoading(false))
   }, [])
@@ -232,12 +280,14 @@ export default function DashboardPage() {
             </h1>
             <p className="text-slate-500 text-sm mt-1">Aquí tienes tus puntos y las ofertas disponibles</p>
           </div>
-          {!loading && points && (
-            <div className="bg-gradient-to-r from-pink-500 to-rose-400 text-white px-6 py-4 rounded-2xl shadow-lg shadow-pink-200 text-center sm:text-right shrink-0">
-              <p className="text-3xl font-extrabold leading-none">{points.total_balance}</p>
-              <p className="text-pink-100 text-sm font-medium mt-1">puntos totales</p>
-            </div>
-          )}
+          <div className="bg-gradient-to-r from-pink-500 to-rose-400 text-white px-6 py-4 rounded-2xl shadow-lg shadow-pink-200 text-center sm:text-right shrink-0">
+            {loading ? (
+              <div className="w-16 h-8 bg-white/20 rounded-lg animate-pulse mx-auto" />
+            ) : (
+              <p className="text-3xl font-extrabold leading-none">{points?.total_balance ?? 0}</p>
+            )}
+            <p className="text-pink-100 text-sm font-medium mt-1">puntos totales</p>
+          </div>
         </div>
 
         {/* Mi QR */}
@@ -249,6 +299,26 @@ export default function DashboardPage() {
             <span className="w-1 h-5 bg-gradient-to-b from-pink-500 to-rose-400 rounded-full inline-block" />
             Mis puntos
           </h2>
+
+          {/* Banner de asociación */}
+          {!loading && points?.points?.some((p) => p.type === 'group') && (
+            <div className="mb-4 flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-2xl px-5 py-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center shrink-0">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-violet-700">Perteneces a la asociación</p>
+                <p className="text-sm font-bold text-violet-900">
+                  {points.points.find((p) => p.type === 'group')?.name}
+                </p>
+              </div>
+              <span className="ml-auto text-xs text-violet-500 font-medium">Puntos compartidos</span>
+            </div>
+          )}
+
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Array.from({ length: 3 }).map((_, i) => (
@@ -260,6 +330,8 @@ export default function DashboardPage() {
               <p className="text-slate-400 text-sm">Todavía no tienes puntos acumulados.</p>
               <p className="text-slate-400 text-xs mt-1">Visita los comercios asociados para empezar.</p>
             </div>
+          ) : points?.points?.length === 1 ? (
+            <PointCard item={points.points[0]} />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {points?.points?.map((item, i) => <PointCard key={i} item={item} />)}
@@ -286,6 +358,29 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {offers.map((offer) => <OfferCard key={offer.id} offer={offer} />)}
+            </div>
+          )}
+        </section>
+
+        {/* Recompensas disponibles */}
+        <section>
+          <h2 className="text-base font-extrabold text-slate-700 mb-4 flex items-center gap-2">
+            <span className="w-1 h-5 bg-gradient-to-b from-violet-500 to-pink-500 rounded-full inline-block" />
+            Recompensas disponibles
+          </h2>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-violet-100 p-5 h-36 animate-pulse" />
+              ))}
+            </div>
+          ) : rewards.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-violet-100 p-10 text-center">
+              <p className="text-slate-400 text-sm">No hay recompensas disponibles en este momento.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rewards.map((reward) => <RewardCard key={reward.id} reward={reward} />)}
             </div>
           )}
         </section>

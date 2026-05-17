@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
+use App\Models\GroupPoint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,12 +22,24 @@ class BusinessController extends Controller
             return response()->json(['message' => 'No tienes un negocio registrado.'], 404);
         }
 
-        $stats = [
-            'total_customers'       => $business->points()->distinct('user_id')->count('user_id'),
-            'total_points_issued'   => (int) $business->points()->sum('total_earned'),
-            'total_points_redeemed' => (int) $business->points()->sum('total_redeemed'),
-            'active_rewards'        => $business->rewards()->where('is_active', true)->count(),
-        ];
+        $group = $business->groups()->first();
+
+        if ($group) {
+            $gp = GroupPoint::where('group_id', $group->id);
+            $stats = [
+                'total_customers'       => (clone $gp)->distinct('user_id')->count('user_id'),
+                'total_points_issued'   => (int) (clone $gp)->sum('total_earned'),
+                'total_points_redeemed' => (int) (clone $gp)->sum('total_redeemed'),
+                'active_rewards'        => $business->rewards()->where('is_active', true)->count(),
+            ];
+        } else {
+            $stats = [
+                'total_customers'       => $business->points()->distinct('user_id')->count('user_id'),
+                'total_points_issued'   => (int) $business->points()->sum('total_earned'),
+                'total_points_redeemed' => (int) $business->points()->sum('total_redeemed'),
+                'active_rewards'        => $business->rewards()->where('is_active', true)->count(),
+            ];
+        }
 
         return response()->json(array_merge($business->toArray(), ['stats' => $stats]));
     }
