@@ -93,6 +93,38 @@ class PointController extends Controller
         return response()->json($point->load(['user', 'business']), 201);
     }
 
+    public function myPoints(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $individual = Point::with('business')
+            ->where('user_id', $user->id)
+            ->get()
+            ->map(fn($p) => [
+                'type'           => 'individual',
+                'name'           => $p->business->name,
+                'balance'        => $p->balance,
+                'total_earned'   => $p->total_earned,
+                'total_redeemed' => $p->total_redeemed,
+            ]);
+
+        $group = GroupPoint::with('group')
+            ->where('user_id', $user->id)
+            ->get()
+            ->map(fn($p) => [
+                'type'           => 'group',
+                'name'           => $p->group->name,
+                'balance'        => $p->balance,
+                'total_earned'   => $p->total_earned,
+                'total_redeemed' => $p->total_redeemed,
+            ]);
+
+        return response()->json([
+            'points'      => $individual->merge($group)->values(),
+            'total_balance' => $individual->sum('balance') + $group->sum('balance'),
+        ]);
+    }
+
     public function show(Point $point): JsonResponse
     {
         return response()->json($point->load(['user', 'business']));

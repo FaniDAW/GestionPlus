@@ -29,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Ofertas — acceso y filtrado por rol dentro del controlador
     Route::apiResource('offers', OfferController::class);
+
+    // Puntos del cliente autenticado
+    Route::get('/my-points', [PointController::class, 'myPoints']);
 });
 
 // Solo admin
