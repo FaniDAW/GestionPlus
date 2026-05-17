@@ -37,6 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Puntos del cliente autenticado
     Route::get('/my-points', [PointController::class, 'myPoints']);
+
+    // Recompensas — listado filtrado por rol dentro del controlador
+    Route::get('/rewards', [RewardController::class, 'index']);
 });
 
 // Solo admin
@@ -62,8 +65,9 @@ Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function ()
 
 // Solo business_owner
 Route::middleware(['auth:sanctum', 'role:business_owner'])->group(function () {
-    Route::get('/my-business', [BusinessController::class, 'myBusiness']);
-    Route::apiResource('rewards', RewardController::class);
-    Route::apiResource('points', PointController::class);
+    Route::get('/my-business',        [BusinessController::class, 'myBusiness']);
+    Route::get('/qr/scan/{code}',     [QrController::class, 'scan']);
+    Route::apiResource('rewards',      RewardController::class)->except(['index']);
+    Route::apiResource('points',       PointController::class);
     Route::apiResource('transactions', TransactionController::class);
 });

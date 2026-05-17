@@ -19,6 +19,7 @@ import BusinessOverview from './pages/business/BusinessOverview'
 import BusinessRewards from './pages/business/BusinessRewards'
 import BusinessTransactions from './pages/business/BusinessTransactions'
 import BusinessOffers from './pages/business/BusinessOffers'
+import BusinessScanner from './pages/business/BusinessScanner'
 
 import AssociationLayout from './pages/association/AssociationLayout'
 import AssociationOverview from './pages/association/AssociationOverview'
@@ -98,6 +99,7 @@ function AppRoutes() {
       }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard"    element={<BusinessOverview />} />
+        <Route path="scanner"      element={<BusinessScanner />} />
         <Route path="rewards"      element={<BusinessRewards />} />
         <Route path="transactions" element={<BusinessTransactions />} />
         <Route path="offers"       element={<BusinessOffers />} />
