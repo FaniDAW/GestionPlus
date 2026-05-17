@@ -14,20 +14,20 @@ export default function Hero() {
           <div className="flex-1 text-center lg:text-left">
             <span className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-              Plataforma de fidelización #1 para PYMEs
+              Para negocios individuales y asociaciones de comerciantes
             </span>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-800 leading-tight mb-6">
-              Convierte clientes{' '}
+              Fideliza clientes —{' '}
               <span className="bg-linear-to-r from-violet-600 to-pink-500 bg-clip-text text-transparent">
-                ocasionales
-              </span>{' '}
-              en fans de tu marca
+                solo o en red
+              </span>
             </h1>
 
             <p className="text-lg text-slate-500 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
-              Crea programas de puntos, recompensas y suscripciones personalizadas. Aumenta la retención y
-              el ticket medio de tu negocio en semanas.
+              Tanto si tienes un negocio como si gestionas una asociación de comerciantes o un municipio,
+              Gestion+ te da el programa de puntos, ofertas y recompensas que necesitas para retener
+              clientes y dinamizar el comercio local.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -37,17 +37,16 @@ export default function Hero() {
               >
                 Empieza gratis — 14 días
               </Link>
-              <a
-                href="#cómo-funciona"
+              <button
+                onClick={() => document.getElementById('cómo-funciona')?.scrollIntoView({ behavior: 'smooth' })}
                 className="flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold px-8 py-4 rounded-2xl border border-slate-200 hover:border-violet-300 hover:text-violet-600 transition-all"
               >
-
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Ver demo
-              </a>
+              </button>
             </div>
 
             <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start">
@@ -59,7 +58,7 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-sm text-slate-500">
-                <span className="font-bold text-slate-700">+2.400</span> negocios confían en Gestion+
+                <span className="font-bold text-slate-700">+2.400</span> negocios y asociaciones confían en Gestion+
               </p>
             </div>
           </div>
@@ -82,12 +81,21 @@ export default function Hero() {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
-                    { label: 'Clientes', value: '1.248', color: 'bg-violet-50 text-violet-700', icon: '👥' },
-                    { label: 'Puntos entregados', value: '48.3K', color: 'bg-pink-50 text-pink-700', icon: '⭐' },
-                    { label: 'Canjes hoy', value: '34', color: 'bg-emerald-50 text-emerald-700', icon: '🎁' },
+                    {
+                      label: 'Clientes', value: '1.248', color: 'bg-violet-50 text-violet-700',
+                      icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
+                    },
+                    {
+                      label: 'Puntos entregados', value: '48.3K', color: 'bg-pink-50 text-pink-700',
+                      icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>,
+                    },
+                    {
+                      label: 'Canjes hoy', value: '34', color: 'bg-emerald-50 text-emerald-700',
+                      icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>,
+                    },
                   ].map((stat) => (
                     <div key={stat.label} className={`${stat.color} rounded-2xl p-3`}>
-                      <p className="text-lg mb-1">{stat.icon}</p>
+                      <p className="mb-1">{stat.icon}</p>
                       <p className="text-sm font-bold">{stat.value}</p>
                       <p className="text-xs opacity-70 leading-tight">{stat.label}</p>
                     </div>
@@ -134,7 +142,11 @@ export default function Hero() {
 
               {/* Floating badge */}
               <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg shadow-pink-100 border border-pink-100 px-4 py-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-pink-100 flex items-center justify-center text-lg">🚀</div>
+                <div className="w-9 h-9 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
                 <div>
                   <p className="text-xs font-bold text-slate-700">+23% retención</p>
                   <p className="text-xs text-slate-400">este mes</p>
@@ -142,7 +154,11 @@ export default function Hero() {
               </div>
 
               <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-lg shadow-violet-100 border border-violet-100 px-4 py-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center text-lg">⭐</div>
+                <div className="w-9 h-9 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                </div>
                 <div>
                   <p className="text-xs font-bold text-slate-700">4.9 / 5.0</p>
                   <p className="text-xs text-slate-400">satisfacción</p>

@@ -32,12 +32,12 @@ export default function CTASection() {
               >
                 Crear mi cuenta gratis
               </Link>
-              <a
-                href="#como-funciona"
+              <button
+                onClick={() => document.getElementById('cómo-funciona')?.scrollIntoView({ behavior: 'smooth' })}
                 className="border-2 border-white/50 text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white/10 transition-all"
               >
                 Ver demo en vivo
-              </a>
+              </button>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6">

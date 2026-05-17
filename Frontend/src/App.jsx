@@ -8,6 +8,7 @@ import HowItWorks from './components/HowItWorks'
 import Pricing from './components/Pricing'
 import Testimonials from './components/Testimonials'
 import CTASection from './components/CTASection'
+import AssociationSection from './components/AssociationSection'
 import Footer from './components/Footer'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -48,6 +49,7 @@ function LandingPage() {
         <Hero />
         <Features />
         <HowItWorks />
+        <AssociationSection />
         <Pricing />
         <Testimonials />
         <CTASection />
