@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OfferController;
@@ -24,6 +25,7 @@ Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me',      [AuthController::class, 'me']);
+    Route::get('/me/qr',   [QrController::class, 'show']);
 
     Route::post('/stripe/checkout', [StripeController::class, 'createCheckoutSession']);
 

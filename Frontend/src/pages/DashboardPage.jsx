@@ -80,6 +80,95 @@ function OfferCard({ offer }) {
   )
 }
 
+function QrSection() {
+  const [qrSvg, setQrSvg]     = useState(null)
+  const [qrError, setQrError] = useState(false)
+
+  useEffect(() => {
+    api.get('/me/qr', { responseType: 'text', headers: { Accept: 'image/svg+xml' } })
+      .then((res) => setQrSvg(res.data))
+      .catch(() => setQrError(true))
+  }, [])
+
+  const handleDownload = () => {
+    if (!qrSvg) return
+    const blob = new Blob([qrSvg], { type: 'image/svg+xml' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = 'mi-qr-gestion.svg'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <section>
+      <h2 className="text-base font-extrabold text-slate-700 mb-4 flex items-center gap-2">
+        <span className="w-1 h-5 bg-gradient-to-b from-pink-500 to-rose-400 rounded-full inline-block" />
+        Mi QR
+      </h2>
+
+      <div className="bg-white rounded-3xl border border-pink-100 shadow-sm p-8 flex flex-col sm:flex-row items-center gap-8">
+        {/* QR visual */}
+        <div className="shrink-0 flex flex-col items-center gap-4">
+          <div className="w-[180px] h-[180px] rounded-2xl border-4 border-pink-100 bg-pink-50/50 flex items-center justify-center shadow-sm shadow-pink-100">
+            {qrError ? (
+              <p className="text-xs text-slate-400 text-center px-4">No se pudo cargar el QR</p>
+            ) : qrSvg ? (
+              <div
+                className="p-1"
+                dangerouslySetInnerHTML={{ __html: qrSvg }}
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-xl bg-pink-100 animate-pulse" />
+            )}
+          </div>
+
+          <button
+            onClick={handleDownload}
+            disabled={!qrSvg}
+            className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-pink-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Descargar QR
+          </button>
+        </div>
+
+        {/* Texto explicativo */}
+        <div className="flex-1 text-center sm:text-left">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-sm shadow-pink-200">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-extrabold text-slate-800 mb-2">
+            Muestra este código en el negocio para acumular puntos
+          </h3>
+          <p className="text-sm text-slate-500 leading-relaxed mb-4">
+            El comerciante escaneará tu QR en cada compra y los puntos se añadirán automáticamente a tu saldo.
+            No necesitas ninguna app extra.
+          </p>
+          <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+            {[
+              { icon: '🏪', text: 'Válido en todos los negocios adheridos' },
+              { icon: '⚡', text: 'Los puntos se añaden al instante' },
+            ].map((item) => (
+              <span key={item.text} className="inline-flex items-center gap-1.5 bg-pink-50 text-pink-700 text-xs font-medium px-3 py-1.5 rounded-full">
+                <span>{item.icon}</span>
+                {item.text}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function DashboardPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -150,6 +239,9 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Mi QR */}
+        <QrSection />
 
         {/* Mis puntos */}
         <section>
