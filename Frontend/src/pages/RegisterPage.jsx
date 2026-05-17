@@ -8,37 +8,40 @@ import api from '../lib/api'
 
 const plans = [
   {
-    id: 'starter',
-    name: 'Starter',
+    id: 'individual',
+    name: 'Individual',
     price: '29',
     period: '/mes',
-    description: 'Perfecto para empezar',
-    color: 'border-slate-200',
-    selectedColor: 'border-violet-400 bg-violet-50',
+    description: 'Para un negocio suelto',
     badge: null,
-    features: ['Hasta 500 clientes', 'Programa de puntos', '3 recompensas', 'Dashboard básico'],
+    features: ['Un negocio', 'Clientes ilimitados', 'Programa de puntos propio', 'Dashboard de actividad'],
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: '79',
+    id: 'association_s',
+    name: 'Asociación S',
+    price: '149',
     period: '/mes',
-    description: 'Para negocios en crecimiento',
-    color: 'border-slate-200',
-    selectedColor: 'border-violet-400 bg-violet-50',
+    description: 'Hasta 20 negocios',
+    badge: null,
+    features: ['Hasta 20 negocios', 'Puntos compartidos entre negocios', 'Panel de la asociación', 'Ofertas de grupo'],
+  },
+  {
+    id: 'association_m',
+    name: 'Asociación M',
+    price: '249',
+    period: '/mes',
+    description: 'Hasta 50 negocios',
     badge: 'Más popular',
-    features: ['Clientes ilimitados', 'Puntos avanzados', 'Recompensas ilimitadas', 'Membresías', 'Analytics'],
+    features: ['Hasta 50 negocios', 'Todo lo del plan S', 'Segmentación de clientes', 'Manager de cuenta'],
   },
   {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: '199',
+    id: 'municipal',
+    name: 'Municipal',
+    price: '499',
     period: '/mes',
-    description: 'Para cadenas y franquicias',
-    color: 'border-slate-200',
-    selectedColor: 'border-violet-400 bg-violet-50',
+    description: 'Negocios ilimitados',
     badge: null,
-    features: ['Todo lo del Pro', 'Multi-negocio', 'API acceso', 'Manager dedicado'],
+    features: ['Negocios ilimitados', 'Todo lo del plan M', 'Branding personalizado', 'SLA garantizado'],
   },
 ]
 
@@ -84,7 +87,7 @@ export default function RegisterPage() {
   const { register: authRegister } = useAuth()
   const navigate = useNavigate()
   const [step, setStep]             = useState(1)
-  const [selectedPlan, setSelectedPlan] = useState('pro')
+  const [selectedPlan, setSelectedPlan] = useState('individual')
   const [serverError, setServerError]   = useState('')
   const [loadingCheckout, setLoadingCheckout] = useState(false)
 
@@ -302,14 +305,16 @@ export default function RegisterPage() {
             {/* ── STEP 2: elige plan ── */}
             {step === 2 && (
               <div>
-                <div className="grid sm:grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-4 mb-8">
                   {plans.map((plan) => (
                     <button
                       key={plan.id}
                       type="button"
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`relative text-left rounded-2xl border-2 p-4 transition-all ${
-                        selectedPlan === plan.id ? plan.selectedColor : plan.color + ' hover:border-violet-200'
+                        selectedPlan === plan.id
+                          ? 'border-violet-400 bg-violet-50'
+                          : 'border-slate-200 hover:border-violet-200'
                       }`}
                     >
                       {plan.badge && (
