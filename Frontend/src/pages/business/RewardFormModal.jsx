@@ -1,27 +1,29 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
+function defaultsFor(r) {
+  return r
+    ? {
+        name:            r.name,
+        description:     r.description ?? '',
+        points_required: r.points_required,
+        stock:           r.stock ?? '',
+        is_active:       r.is_active,
+        expires_at:      r.expires_at ? r.expires_at.split('T')[0] : '',
+      }
+    : { name: '', description: '', points_required: '', stock: '', is_active: true, expires_at: '' }
+}
+
 export default function RewardFormModal({ reward, businessId, onSave, onClose }) {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm()
+  } = useForm({ defaultValues: defaultsFor(reward) })
 
   useEffect(() => {
-    if (reward) {
-      reset({
-        name:            reward.name,
-        description:     reward.description ?? '',
-        points_required: reward.points_required,
-        stock:           reward.stock ?? '',
-        is_active:       reward.is_active,
-        expires_at:      reward.expires_at ? reward.expires_at.split('T')[0] : '',
-      })
-    } else {
-      reset({ name: '', description: '', points_required: '', stock: '', is_active: true, expires_at: '' })
-    }
+    reset(defaultsFor(reward))
   }, [reward, reset])
 
   const onSubmit = async (data) => {
@@ -44,10 +46,10 @@ export default function RewardFormModal({ reward, businessId, onSave, onClose })
     }`
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-lg max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 shrink-0">
           <h3 className="text-base font-extrabold text-slate-800">
             {reward ? 'Editar recompensa' : 'Nueva recompensa'}
           </h3>
@@ -59,7 +61,7 @@ export default function RewardFormModal({ reward, businessId, onSave, onClose })
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="px-6 py-5 space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="px-4 sm:px-6 py-5 space-y-4 overflow-y-auto">
           {/* Nombre */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nombre</label>
@@ -83,7 +85,7 @@ export default function RewardFormModal({ reward, businessId, onSave, onClose })
           </div>
 
           {/* Puntos y Stock */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">Puntos requeridos</label>
               <input

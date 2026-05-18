@@ -16,6 +16,32 @@ class RewardController extends Controller
         $user = $request->user();
 
         if ($user->role === 'customer') {
+            $requestedGroupId = $request->query('group_id');
+
+            // Si se pasa group_id y el cliente pertenece a ese grupo, filtrar solo por ese grupo
+            if ($requestedGroupId) {
+                $belongs = GroupPoint::where('user_id', $user->id)
+                    ->where('group_id', $requestedGroupId)
+                    ->exists();
+
+                if ($belongs) {
+                    $groupBusinessIds = DB::table('group_business')
+                        ->where('group_id', $requestedGroupId)
+                        ->pluck('business_id');
+
+                    return response()->json(
+                        Reward::with('business')
+                            ->whereIn('business_id', $groupBusinessIds)
+                            ->where('is_active', true)
+                            ->where(fn($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+                            ->where(fn($q) => $q->whereNull('stock')->orWhere('stock', '>', 0))
+                            ->orderBy('points_required')
+                            ->get()
+                    );
+                }
+            }
+
+            // Fallback: todas las recompensas de negocios donde el cliente tiene puntos
             $groupIds = GroupPoint::where('user_id', $user->id)->pluck('group_id');
             $groupBusinessIds = $groupIds->isEmpty() ? collect() :
                 DB::table('group_business')->whereIn('group_id', $groupIds)->pluck('business_id');

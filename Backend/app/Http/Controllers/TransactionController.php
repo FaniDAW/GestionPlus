@@ -85,6 +85,23 @@ class TransactionController extends Controller
                 return response()->json(['message' => 'Esta recompensa ya no está disponible.'], 422);
             }
 
+            // Comprobar si ya hay un código de canje activo para esta recompensa
+            $existing = Transaction::where('user_id', $user->id)
+                ->where('redeemable_type', 'reward')
+                ->where('redeemable_id', $reward->id)
+                ->where('status', 'pending')
+                ->where('expires_at', '>', now())
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'message'    => 'Ya tienes un código de canje activo para esta recompensa.',
+                    'code'       => $existing->code,
+                    'expires_at' => $existing->expires_at,
+                    'reward'     => $reward->only(['id', 'name', 'description', 'points_required']),
+                ], 409);
+            }
+
             $business = Business::findOrFail($reward->business_id);
             $group    = $business->groups()->first();
 
@@ -94,7 +111,11 @@ class TransactionController extends Controller
                     ->where('group_id', $group->id)
                     ->first();
 
-                if (! $gp || $gp->balance < $reward->points_required) {
+                if (! $gp) {
+                    return response()->json(['message' => 'Esta recompensa no es válida en este negocio.'], 422);
+                }
+
+                if ($gp->balance < $reward->points_required) {
                     return response()->json(['message' => 'Saldo de puntos insuficiente.'], 422);
                 }
             } else {
@@ -210,6 +231,16 @@ class TransactionController extends Controller
                         $point->increment('total_redeemed', $transaction->points);
                     }
                 }
+            }
+
+            // Descontar stock y desactivar si se agota
+            if ($reward && $reward->stock !== null) {
+                $newStock = max(0, $reward->stock - 1);
+                $updates  = ['stock' => $newStock];
+                if ($newStock <= 0) {
+                    $updates['is_active'] = false;
+                }
+                $reward->update($updates);
             }
         } elseif ($transaction->redeemable_type === 'offer') {
             $meta = Offer::find($transaction->redeemable_id)?->only(['title', 'description', 'discount_type', 'discount_value']);

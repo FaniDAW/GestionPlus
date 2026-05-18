@@ -397,29 +397,36 @@ export default function DashboardPage() {
   const [redeemResult, setRedeemResult] = useState(null)  // modal data
 
   useEffect(() => {
-    Promise.all([
-      api.get('/me'),
-      api.get('/offers'),
-      api.get('/rewards'),
-    ])
-      .then(([meRes, ofRes, rwRes]) => {
-        setPoints({
+    Promise.all([api.get('/me'), api.get('/offers')])
+      .then(([meRes, ofRes]) => {
+        const pts = {
           points:        meRes.data.points        ?? [],
           total_balance: meRes.data.total_balance ?? 0,
-        })
+        }
+        setPoints(pts)
         setOffers(ofRes.data)
-        setRewards(rwRes.data)
+        // Filtrar recompensas por el grupo del cliente para evitar mostrar
+        // recompensas de negocios fuera de su red
+        const groupId = pts.points.find((p) => p.type === 'group')?.group_id ?? null
+        return api.get('/rewards', groupId ? { params: { group_id: groupId } } : {})
       })
+      .then((rwRes) => setRewards(rwRes.data))
       .finally(() => setLoading(false))
   }, [])
 
   const handleRedeemReward = useCallback(async (reward) => {
-    const res = await api.post('/transactions/redeem', {
-      redeemable_type: 'reward',
-      redeemable_id:   reward.id,
-    })
-    // Los puntos NO se tocan aquí — el descuento ocurre cuando el negocio valida el código
-    setRedeemResult(res.data)
+    try {
+      const res = await api.post('/transactions/redeem', {
+        redeemable_type: 'reward',
+        redeemable_id:   reward.id,
+      })
+      setRedeemResult(res.data)
+    } catch (err) {
+      // 409 = ya existe código activo; mostrarlo igual
+      if (err.response?.status === 409) {
+        setRedeemResult(err.response.data)
+      }
+    }
   }, [])
 
   const handleRedeemOffer = useCallback(async (offer) => {

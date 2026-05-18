@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Offer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OfferController extends Controller
 {
@@ -27,11 +28,20 @@ class OfferController extends Controller
                 break;
 
             case 'business_owner':
-                // Ve sus propias ofertas individuales y las globales
+                // Ve sus propias ofertas individuales, las globales y las del grupo al que pertenece
                 $businessId = $user->businesses()->first()?->id;
+                $groupIds   = $businessId
+                    ? DB::table('group_business')->where('business_id', $businessId)->pluck('group_id')
+                    : collect();
+
                 $query->where(fn($q) => $q
                     ->where('scope', 'global')
                     ->orWhere(fn($q2) => $q2->where('scope', 'individual')->where('business_id', $businessId))
+                    ->orWhere(fn($q3) => $q3
+                        ->where('scope', 'group')
+                        ->whereIn('group_id', $groupIds)
+                        ->where('is_active', true)
+                    )
                 );
                 break;
 

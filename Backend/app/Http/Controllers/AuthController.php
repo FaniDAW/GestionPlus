@@ -137,6 +137,7 @@ class AuthController extends Controller
             ->get()
             ->map(fn($p) => [
                 'type'           => 'group',
+                'group_id'       => $p->group_id,
                 'name'           => $p->group?->name ?? '',
                 'balance'        => $p->balance,
                 'total_earned'   => $p->total_earned,
