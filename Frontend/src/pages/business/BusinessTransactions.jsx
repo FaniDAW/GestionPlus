@@ -24,13 +24,13 @@ export default function BusinessTransactions() {
   }, [])
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-extrabold text-slate-800">Transacciones</h1>
         <p className="text-slate-500 text-sm mt-1">Historial de movimientos de puntos de tu negocio</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -91,6 +91,50 @@ export default function BusinessTransactions() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/3" />
+              <div className="h-3 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-2/3" />
+            </div>
+          ))
+        ) : transactions.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">No hay transacciones registradas</p>
+          </div>
+        ) : (
+          transactions.map((tx) => {
+            const cfg = typeConfig[tx.type] ?? { label: tx.type, classes: 'bg-slate-100 text-slate-500' }
+            return (
+              <div key={tx.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center shrink-0">
+                      <span className="text-white font-bold text-xs">{tx.user?.name?.[0]?.toUpperCase()}</span>
+                    </div>
+                    <span className="font-semibold text-slate-800 text-sm">{tx.user?.name ?? '—'}</span>
+                  </div>
+                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.classes}`}>
+                    {cfg.label}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                  <span>{formatDate(tx.created_at)}</span>
+                  <span className="font-semibold text-slate-800">
+                    {tx.type === 'redeem' ? `-${tx.points}` : `+${tx.points}`} pts
+                  </span>
+                  {tx.amount != null && <span>{Number(tx.amount).toFixed(2)} €</span>}
+                </div>
+                {tx.description && <p className="text-xs text-slate-400 truncate">{tx.description}</p>}
+              </div>
+            )
+          })
+        )}
       </div>
     </div>
   )

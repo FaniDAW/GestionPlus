@@ -39,13 +39,13 @@ export default function AdminUsers() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-extrabold text-slate-800">Usuarios</h1>
         <p className="text-slate-500 text-sm mt-1">Listado de todos los usuarios registrados</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -129,6 +129,67 @@ export default function AdminUsers() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-3/4" />
+              <div className="h-8 bg-slate-100 rounded-xl w-full" />
+            </div>
+          ))
+        ) : users.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">No hay usuarios registrados</p>
+          </div>
+        ) : (
+          users.map((u) => (
+            <div key={u.id} className={`bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 ${u.is_active === false ? 'opacity-70' : ''}`}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                    u.is_active === false ? 'bg-slate-200' : 'bg-gradient-to-br from-violet-400 to-pink-400'
+                  }`}>
+                    <span className={`font-bold text-xs ${u.is_active === false ? 'text-slate-400' : 'text-white'}`}>
+                      {u.name?.[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`font-semibold text-sm truncate ${u.is_active === false ? 'text-slate-400' : 'text-slate-800'}`}>{u.name}</p>
+                    <p className="text-xs text-slate-400 truncate">{u.email}</p>
+                  </div>
+                </div>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
+                  u.is_active === false ? 'bg-slate-100 text-slate-500' : 'bg-emerald-100 text-emerald-700'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${u.is_active === false ? 'bg-slate-400' : 'bg-emerald-500'}`} />
+                  {u.is_active === false ? 'Inactivo' : 'Activo'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  u.is_active === false ? 'bg-slate-100 text-slate-400' : (roleBadge[u.role] ?? 'bg-slate-100 text-slate-500')
+                }`}>
+                  {roleLabel[u.role] ?? u.role}
+                </span>
+                <button
+                  disabled={toggling === u.id}
+                  onClick={() => setConfirm({ user: u })}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 ${
+                    u.is_active === false
+                      ? 'bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700'
+                      : 'bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600'
+                  }`}
+                >
+                  {toggling === u.id ? '...' : u.is_active === false ? 'Activar' : 'Desactivar'}
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <ConfirmDialog

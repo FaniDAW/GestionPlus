@@ -321,7 +321,7 @@ export default function AssociationBusinesses() {
   const atLimit    = max !== null && businesses.length >= max
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-6">
       {showModal && (
         <AddExistingModal
           group={group}
@@ -369,7 +369,7 @@ export default function AssociationBusinesses() {
           </button>
         </div>
 
-        <table className="w-full text-sm">
+        <table className="hidden md:table w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
               <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Negocio</th>
@@ -428,6 +428,45 @@ export default function AssociationBusinesses() {
             )}
           </tbody>
         </table>
+
+        {/* Mobile cards */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {loading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="p-4 space-y-2 animate-pulse">
+                <div className="h-4 bg-slate-100 rounded w-1/2" />
+                <div className="h-3 bg-slate-100 rounded w-3/4" />
+              </div>
+            ))
+          ) : businesses.length === 0 ? (
+            <div className="px-6 py-14 text-center">
+              <p className="text-slate-400 text-sm">No hay negocios en esta asociación todavía.</p>
+              <p className="text-slate-400 text-xs mt-1">Genera un enlace de invitación o añade un negocio existente.</p>
+            </div>
+          ) : (
+            businesses.map((biz) => (
+              <div key={biz.id} className="p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-slate-800">{biz.name}</p>
+                    {biz.address && <p className="text-xs text-slate-400 mt-0.5">{biz.address}</p>}
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
+                    biz.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${biz.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                    {biz.is_active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                  {biz.owner?.name && <span>Propietario: {biz.owner.name}</span>}
+                  {biz.email && <span>{biz.email}</span>}
+                  {biz.phone && <span>{biz.phone}</span>}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   )

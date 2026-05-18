@@ -15,16 +15,22 @@ function discountLabel(offer) {
 }
 
 export default function BusinessOffers() {
-  const [offers, setOffers]             = useState([])
-  const [loading, setLoading]           = useState(true)
-  const [formOffer, setFormOffer]       = useState(undefined)
+  const [offers, setOffers]           = useState([])
+  const [groupOffers, setGroupOffers] = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [formOffer, setFormOffer]     = useState(undefined)
   const [deleteTarget, setDeleteTarget] = useState(null)
 
   useEffect(() => {
     api.get('/offers')
-      .then((res) => setOffers(res.data.filter((o) => o.scope === 'individual')))
+      .then((res) => {
+        setOffers(res.data.filter((o) => o.scope === 'individual'))
+        setGroupOffers(res.data.filter((o) => o.scope === 'group'))
+      })
       .finally(() => setLoading(false))
   }, [])
+
+  const groupName = groupOffers[0]?.group?.name ?? 'la asociación'
 
   const handleSave = async (payload) => {
     if (formOffer?.id) {
@@ -44,8 +50,8 @@ export default function BusinessOffers() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex items-center justify-between mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800">Mis ofertas</h1>
           <p className="text-slate-500 text-sm mt-1">Ofertas individuales visibles para tus clientes</p>
@@ -61,7 +67,7 @@ export default function BusinessOffers() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -147,6 +153,175 @@ export default function BusinessOffers() {
           </tbody>
         </table>
       </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-1/3" />
+              <div className="h-3 bg-slate-100 rounded w-2/3" />
+            </div>
+          ))
+        ) : offers.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">Aún no tienes ofertas. ¡Crea la primera!</p>
+          </div>
+        ) : (
+          offers.map((offer) => (
+            <div key={offer.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold text-slate-800">{offer.title}</p>
+                  {offer.description && <p className="text-xs text-slate-400 mt-0.5">{offer.description}</p>}
+                </div>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
+                  offer.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${offer.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                  {offer.is_active ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full font-bold bg-violet-100 text-violet-700">
+                  {discountLabel(offer)}
+                </span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
+                  {formatDate(offer.starts_at)} → {formatDate(offer.ends_at)}
+                </span>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                <button onClick={() => setFormOffer(offer)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button onClick={() => setDeleteTarget(offer)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ── Ofertas de la asociación (solo lectura) ──────────────────── */}
+      {(loading || groupOffers.length > 0) && (
+        <div className="mt-8 md:mt-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div>
+              <h2 className="text-lg font-extrabold text-slate-800">Ofertas de la asociación</h2>
+              <p className="text-slate-500 text-sm mt-0.5">
+                Gestionadas por {groupName} · solo lectura
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Red comercial
+            </span>
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-emerald-50/60 border-b border-emerald-100">
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-emerald-700 uppercase tracking-wider">Oferta</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-emerald-700 uppercase tracking-wider">Descuento</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-emerald-700 uppercase tracking-wider">Vigencia</th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold text-emerald-700 uppercase tracking-wider">Estado</th>
+                  <th className="px-6 py-4" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-emerald-50">
+                {loading ? (
+                  Array.from({ length: 2 }).map((_, i) => (
+                    <tr key={i}>
+                      {Array.from({ length: 4 }).map((__, j) => (
+                        <td key={j} className="px-6 py-4">
+                          <div className="h-4 bg-slate-100 rounded-lg animate-pulse w-24" />
+                        </td>
+                      ))}
+                      <td className="px-6 py-4" />
+                    </tr>
+                  ))
+                ) : (
+                  groupOffers.map((offer) => (
+                    <tr key={offer.id} className="hover:bg-emerald-50/40 transition-colors">
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-slate-800">{offer.title}</p>
+                        {offer.description && (
+                          <p className="text-xs text-slate-400 mt-0.5 max-w-xs truncate">{offer.description}</p>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                          {discountLabel(offer)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-500 text-xs">
+                        {formatDate(offer.starts_at)} → {formatDate(offer.ends_at)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Activa
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className="text-xs text-slate-400 italic">Solo la asociación puede editar</span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-3">
+            {loading ? (
+              Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="bg-white rounded-2xl border border-emerald-100 shadow-sm p-4 space-y-3 animate-pulse">
+                  <div className="h-4 bg-slate-100 rounded w-1/2" />
+                  <div className="h-3 bg-slate-100 rounded w-2/3" />
+                </div>
+              ))
+            ) : (
+              groupOffers.map((offer) => (
+                <div key={offer.id} className="bg-white rounded-2xl border border-emerald-100 shadow-sm p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-semibold text-slate-800">{offer.title}</p>
+                      {offer.description && <p className="text-xs text-slate-400 mt-0.5">{offer.description}</p>}
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 bg-emerald-100 text-emerald-700">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      Activa
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-700">
+                      {discountLabel(offer)}
+                    </span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
+                      {formatDate(offer.starts_at)} → {formatDate(offer.ends_at)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 italic pt-1 border-t border-emerald-50">
+                    Solo la asociación puede editar
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {formOffer !== undefined && (
         <OfferFormModal offer={formOffer} onSave={handleSave} onClose={() => setFormOffer(undefined)} />

@@ -53,9 +53,9 @@ export default function BusinessRewards() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800">Recompensas</h1>
           <p className="text-slate-500 text-sm mt-1">Gestiona las recompensas de tu programa de fidelización</p>
@@ -71,7 +71,7 @@ export default function BusinessRewards() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -187,6 +187,77 @@ export default function BusinessRewards() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-3/4" />
+              <div className="h-8 bg-slate-100 rounded-xl w-full" />
+            </div>
+          ))
+        ) : rewards.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">Aún no tienes recompensas. ¡Crea la primera!</p>
+          </div>
+        ) : (
+          rewards.map((reward) => (
+            <div key={reward.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold text-slate-800">{reward.name}</p>
+                  {reward.description && <p className="text-xs text-slate-400 mt-0.5">{reward.description}</p>}
+                </div>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
+                  reward.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${reward.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                  {reward.is_active ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold bg-violet-100 text-violet-700">
+                  {reward.points_required} pts
+                </span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium">
+                  Stock: {reward.stock != null ? reward.stock : '∞'}
+                </span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
+                  {formatDate(reward.expires_at)}
+                </span>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                <button disabled={toggling === reward.id} onClick={() => handleToggle(reward)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all disabled:opacity-40">
+                  {reward.is_active ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                </button>
+                <button onClick={() => setFormReward(reward)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button onClick={() => setDeleteTarget(reward)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {formReward !== undefined && (

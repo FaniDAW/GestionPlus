@@ -27,13 +27,13 @@ export default function AdminSubscriptions() {
   }, [])
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-extrabold text-slate-800">Suscripciones</h1>
         <p className="text-slate-500 text-sm mt-1">Historial de todas las suscripciones de la plataforma</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -100,6 +100,49 @@ export default function AdminSubscriptions() {
             )}
           </tbody>
         </table>
+      </div>
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-1/3" />
+              <div className="h-3 bg-slate-100 rounded w-2/3" />
+            </div>
+          ))
+        ) : subscriptions.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">No hay suscripciones registradas</p>
+          </div>
+        ) : (
+          subscriptions.map((sub) => {
+            const expired = isExpired(sub)
+            const status = expired && sub.status === 'active' ? 'expired' : sub.status
+            const cfg = statusConfig[status] ?? statusConfig.expired
+            return (
+              <div key={sub.id} className={`bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 ${expired ? 'border-red-100' : ''}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-slate-800">{sub.business?.name ?? '—'}</p>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 mt-1">
+                      {sub.plan_name}
+                    </span>
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${cfg.classes}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                    {cfg.label}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                  <span className="font-semibold text-slate-700">{Number(sub.price).toFixed(2)} €</span>
+                  <span>Inicio: {formatDate(sub.starts_at)}</span>
+                  <span className={expired ? 'text-red-500 font-medium' : ''}>Vence: {formatDate(sub.ends_at)}</span>
+                </div>
+              </div>
+            )
+          })
+        )}
       </div>
     </div>
   )

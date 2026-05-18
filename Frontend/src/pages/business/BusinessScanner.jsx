@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import api from '../../lib/api'
 import QrScanner from '../../components/QrScanner'
 
@@ -51,7 +51,7 @@ function ValidateCodeSection() {
         Validar código de canje
       </h3>
 
-      <form onSubmit={handleValidate} className="flex gap-3 mb-4">
+      <form onSubmit={handleValidate} className="flex flex-col sm:flex-row gap-3 mb-4">
         <input
           value={code}
           onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(''); setResult(null) }}
@@ -151,6 +151,15 @@ export default function BusinessScanner() {
   const [successMsg, setSuccessMsg]       = useState('')
   const [actionError, setActionError]     = useState('')
   const [validationResult, setValidationResult] = useState(null)  // resultado de escanear QR de canje
+
+  // Apagar cámara cuando el usuario cambia de pestaña
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) setPhase((p) => p === 'scanning' ? 'idle' : p)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
 
   const flash = (msg, isError = false) => {
     if (isError) { setActionError(msg); setTimeout(() => setActionError(''), 4000) }

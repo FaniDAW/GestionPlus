@@ -52,13 +52,13 @@ export default function AdminBusinesses() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-extrabold text-slate-800">Negocios</h1>
         <p className="text-slate-500 text-sm mt-1">Listado de todos los negocios registrados</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -152,6 +152,73 @@ export default function AdminBusinesses() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-3/4" />
+              <div className="h-8 bg-slate-100 rounded-xl w-full" />
+            </div>
+          ))
+        ) : businesses.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">No hay negocios registrados</p>
+          </div>
+        ) : (
+          businesses.map((biz) => {
+            const sub = subsByBiz[biz.id] ?? null
+            const subStatus = getSubStatus(sub)
+            const cfg = subStatus ? subStatusConfig[subStatus] : null
+            return (
+              <div key={biz.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-slate-800">{biz.name}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{biz.email}</p>
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
+                    biz.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${biz.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                    {biz.is_active ? 'Activo' : 'Inactivo'}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {sub ? (
+                    <span className="inline-flex px-2.5 py-1 rounded-full font-semibold bg-violet-100 text-violet-700">
+                      {sub.plan_name}
+                    </span>
+                  ) : (
+                    <span className="inline-flex px-2.5 py-1 rounded-full bg-slate-100 text-slate-400">Sin plan</span>
+                  )}
+                  {cfg && (
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-semibold ${cfg.classes}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                      {cfg.label}
+                    </span>
+                  )}
+                </div>
+                <div className="pt-1 border-t border-slate-100">
+                  <button
+                    disabled={toggling === biz.id}
+                    onClick={() => setConfirm({ biz })}
+                    className={`w-full py-2 rounded-xl text-xs font-semibold transition-all disabled:opacity-50 ${
+                      biz.is_active
+                        ? 'bg-slate-100 text-slate-600 hover:bg-red-100 hover:text-red-600'
+                        : 'bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700'
+                    }`}
+                  >
+                    {toggling === biz.id ? '...' : biz.is_active ? 'Desactivar' : 'Activar'}
+                  </button>
+                </div>
+              </div>
+            )
+          })
+        )}
       </div>
 
       <ConfirmDialog

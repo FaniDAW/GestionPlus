@@ -38,8 +38,8 @@ function GroupFormModal({ group, onSave, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 shrink-0">
           <h2 className="text-lg font-extrabold text-slate-800">
             {group ? 'Editar asociación' : 'Nueva asociación'}
           </h2>
@@ -49,11 +49,11 @@ function GroupFormModal({ group, onSave, onClose }) {
             </svg>
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+        <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-5 space-y-4 overflow-y-auto">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>
           )}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">Nombre</label>
               <input required value={form.name} onChange={set('name')}
@@ -138,8 +138,8 @@ export default function AdminGroups() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 md:p-8">
+      <div className="flex items-center justify-between mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800">Asociaciones</h1>
           <p className="text-slate-500 text-sm mt-1">Gestión de grupos, asociaciones y municipios</p>
@@ -155,7 +155,7 @@ export default function AdminGroups() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
@@ -232,6 +232,65 @@ export default function AdminGroups() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 animate-pulse">
+              <div className="h-4 bg-slate-100 rounded w-1/2" />
+              <div className="h-3 bg-slate-100 rounded w-1/3" />
+              <div className="h-8 bg-slate-100 rounded-xl w-full" />
+            </div>
+          ))
+        ) : groups.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-12 text-center">
+            <p className="text-slate-400 text-sm">No hay asociaciones registradas.</p>
+          </div>
+        ) : (
+          groups.map((group) => (
+            <div key={group.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="font-semibold text-slate-800">{group.name}</p>
+                  {group.address && <p className="text-xs text-slate-400 mt-0.5">{group.address}</p>}
+                </div>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
+                  group.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${group.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                  {group.is_active ? 'Activa' : 'Inactiva'}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-full font-semibold ${
+                  group.type === 'municipal' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+                }`}>
+                  {TYPE_LABELS[group.type]}
+                </span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium">
+                  {group.businesses?.length ?? 0} negocios
+                </span>
+              </div>
+              {group.contact_email && <p className="text-xs text-slate-400">{group.contact_email}</p>}
+              <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                <button onClick={() => setFormGroup(group)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button onClick={() => setDeleteTarget(group)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {formGroup !== undefined && (
