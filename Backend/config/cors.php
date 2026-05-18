@@ -8,6 +8,8 @@ return [
         'http://localhost:5174',
         'http://192.168.1.19:5173',
         'http://192.168.1.19:5174',
+        'http://10.201.146.35:5173',
+        'http://10.201.146.35:5174',
     ],
     'allowed_origins_patterns' => [],
     'allowed_headers'          => ['*'],

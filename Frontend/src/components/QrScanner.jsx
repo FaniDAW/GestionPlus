@@ -1,48 +1,52 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Html5Qrcode } from 'html5-qrcode'
 
 const SCANNER_ID = 'qr-reader-video'
 
 export default function QrScanner({ onScan }) {
-  const scannerRef = useRef(null)
-  const activeRef  = useRef(true)
   const [camError, setCamError] = useState('')
 
   useEffect(() => {
-    activeRef.current = true
-    let qr
+    let qr = null
+    let scanDone = false
+
+    const stop = () => {
+      try {
+        if (qr && qr.isScanning) qr.stop().catch(() => {})
+      } catch {}
+    }
+
+    const onVisibility = () => {
+      if (document.hidden) stop()
+    }
 
     try {
       qr = new Html5Qrcode(SCANNER_ID)
-      scannerRef.current = qr
 
       qr.start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (text) => {
-          if (!activeRef.current) return
-          activeRef.current = false
-          if (qr.isScanning) {
-            qr.stop().catch(() => {}).finally(() => onScan(text))
-          } else {
-            onScan(text)
-          }
+          if (scanDone) return
+          scanDone = true
+          stop()
+          onScan(text)
         },
         () => {},
       ).catch(() =>
         setCamError('No se pudo acceder a la cámara. Comprueba los permisos del navegador.')
       )
-    } catch (err) {
+    } catch {
       setCamError('No se pudo inicializar el escáner. Recarga la página e inténtalo de nuevo.')
     }
 
+    document.addEventListener('visibilitychange', onVisibility)
+
     return () => {
-      activeRef.current = false
-      if (qr && qr.isScanning) {
-        qr.stop().catch(() => {})
-      }
+      document.removeEventListener('visibilitychange', onVisibility)
+      stop()
     }
-  }, [])
+  }, [onScan])
 
   if (camError) {
     return (
