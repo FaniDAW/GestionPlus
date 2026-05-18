@@ -18,14 +18,139 @@ function CustomerAvatar({ name }) {
   )
 }
 
+function ValidateCodeSection() {
+  const [code, setCode]         = useState('')
+  const [loading, setLoading]   = useState(false)
+  const [result, setResult]     = useState(null)   // { type, customer, meta, points_redeemed }
+  const [error, setError]       = useState('')
+
+  const handleValidate = async (e) => {
+    e.preventDefault()
+    if (!code.trim()) return
+    setLoading(true)
+    setError('')
+    setResult(null)
+    try {
+      const res = await api.post('/transactions/validate-code', { code: code.trim() })
+      setResult(res.data)
+      setCode('')
+    } catch (err) {
+      setError(err.response?.data?.message ?? 'Error al validar el código.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h3 className="font-extrabold text-slate-800 mb-4 flex items-center gap-2">
+        <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Validar código de canje
+      </h3>
+
+      <form onSubmit={handleValidate} className="flex gap-3 mb-4">
+        <input
+          value={code}
+          onChange={(e) => { setCode(e.target.value.toUpperCase()); setError(''); setResult(null) }}
+          placeholder="XXXX-XXXX"
+          maxLength={9}
+          className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm font-mono tracking-widest uppercase outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 focus:bg-white transition-all"
+        />
+        <button
+          type="submit"
+          disabled={loading || !code.trim()}
+          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl hover:shadow-md hover:shadow-emerald-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          {loading ? (
+            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          ) : 'Validar'}
+        </button>
+      </form>
+
+      {error && (
+        <div className="flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 rounded-xl px-4 py-3 text-sm">
+          <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+          {error}
+        </div>
+      )}
+
+      {result && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 space-y-3">
+          <div className="flex items-center gap-2 text-emerald-700 font-semibold text-sm">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+            Código validado correctamente
+          </div>
+          <div className="text-sm text-slate-700 space-y-1">
+            <p><span className="font-semibold text-slate-500">Cliente:</span> {result.customer.name}</p>
+            {result.type === 'reward' && result.meta && (
+              <>
+                <p><span className="font-semibold text-slate-500">Recompensa:</span> {result.meta.name}</p>
+                <p><span className="font-semibold text-slate-500">Puntos canjeados:</span> {result.points_redeemed}</p>
+              </>
+            )}
+            {result.type === 'offer' && result.meta && (
+              <p><span className="font-semibold text-slate-500">Oferta:</span> {result.meta.title}</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Patrón de códigos de canje generados por el sistema (XXXX-XXXX, alfanumérico mayúsculas)
+const REDEMPTION_RE = /^[A-Z0-9]{4}-[A-Z0-9]{4}$/i
+
+function ValidationResult({ result, onDismiss }) {
+  const isReward = result.type === 'reward'
+  const metaLine = isReward
+    ? `${result.meta?.name ?? 'Recompensa'} · ${result.points_redeemed} pts`
+    : result.meta?.title ?? 'Oferta'
+
+  return (
+    <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-5 flex flex-col gap-3">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-extrabold text-emerald-800 text-sm">Código validado</p>
+          <p className="text-emerald-700 text-sm font-medium mt-0.5">{result.customer?.name}</p>
+          <p className="text-emerald-600 text-xs mt-1 font-medium">
+            {isReward ? '🎁' : '🎟️'} {metaLine}
+          </p>
+        </div>
+        <button onClick={onDismiss} className="text-emerald-400 hover:text-emerald-600 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function BusinessScanner() {
-  const [phase, setPhase]           = useState('idle')   // idle | scanning | loading | found
-  const [customer, setCustomer]     = useState(null)
-  const [scanError, setScanError]   = useState('')
-  const [assignPts, setAssignPts]   = useState('')
+  const [phase, setPhase]                 = useState('idle')   // idle | scanning | loading | found
+  const [customer, setCustomer]           = useState(null)
+  const [scanError, setScanError]         = useState('')
+  const [assignPts, setAssignPts]         = useState('')
   const [actionLoading, setActionLoading] = useState(false)
-  const [successMsg, setSuccessMsg] = useState('')
-  const [actionError, setActionError] = useState('')
+  const [successMsg, setSuccessMsg]       = useState('')
+  const [actionError, setActionError]     = useState('')
+  const [validationResult, setValidationResult] = useState(null)  // resultado de escanear QR de canje
 
   const flash = (msg, isError = false) => {
     if (isError) { setActionError(msg); setTimeout(() => setActionError(''), 4000) }
@@ -33,6 +158,23 @@ export default function BusinessScanner() {
   }
 
   const handleScan = async (code) => {
+    const normalized = code.trim().toUpperCase()
+
+    // ── Código de canje (QR de recompensa o uso de oferta) ──
+    if (REDEMPTION_RE.test(normalized)) {
+      setPhase('loading')
+      try {
+        const res = await api.post('/transactions/validate-code', { code: normalized })
+        setValidationResult(res.data)
+        setPhase('idle')
+      } catch (err) {
+        setScanError(err.response?.data?.message || 'Código no válido o ya utilizado.')
+        setPhase('idle')
+      }
+      return
+    }
+
+    // ── QR de cliente (UUID) ──
     setPhase('loading')
     setScanError('')
     try {
@@ -97,6 +239,7 @@ export default function BusinessScanner() {
     setAssignPts('')
     setSuccessMsg('')
     setActionError('')
+    setValidationResult(null)
   }
 
   return (
@@ -130,6 +273,16 @@ export default function BusinessScanner() {
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           </svg>
           {scanError}
+        </div>
+      )}
+
+      {/* Resultado de validación tras escanear QR de canje */}
+      {validationResult && (
+        <div className="mb-6">
+          <ValidationResult
+            result={validationResult}
+            onDismiss={() => setValidationResult(null)}
+          />
         </div>
       )}
 
@@ -183,6 +336,13 @@ export default function BusinessScanner() {
       {phase === 'loading' && (
         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm">
           <Spinner />
+        </div>
+      )}
+
+      {/* ── Validar código manualmente ── */}
+      {phase !== 'scanning' && (
+        <div className="mt-6">
+          <ValidateCodeSection />
         </div>
       )}
 

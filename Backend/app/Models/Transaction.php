@@ -17,10 +17,16 @@ class Transaction extends Model
         'points',
         'amount',
         'description',
+        'code',
+        'status',
+        'expires_at',
+        'redeemable_id',
+        'redeemable_type',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount'     => 'decimal:2',
+        'expires_at' => 'datetime',
     ];
 
     public function user()

@@ -40,6 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Recompensas — listado filtrado por rol dentro del controlador
     Route::get('/rewards', [RewardController::class, 'index']);
+
+    // Canje de recompensas y ofertas (cliente)
+    Route::post('/transactions/redeem', [TransactionController::class, 'redeem']);
 });
 
 // Solo admin
@@ -65,8 +68,9 @@ Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function ()
 
 // Solo business_owner
 Route::middleware(['auth:sanctum', 'role:business_owner'])->group(function () {
-    Route::get('/my-business',        [BusinessController::class, 'myBusiness']);
-    Route::get('/qr/scan/{code}',     [QrController::class, 'scan']);
+    Route::get('/my-business',                              [BusinessController::class, 'myBusiness']);
+    Route::get('/qr/scan/{code}',                           [QrController::class, 'scan']);
+    Route::post('/transactions/validate-code',              [TransactionController::class, 'validateCode']);
     Route::apiResource('rewards',      RewardController::class)->except(['index']);
     Route::apiResource('points',       PointController::class);
     Route::apiResource('transactions', TransactionController::class);
