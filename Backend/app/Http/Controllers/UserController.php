@@ -54,4 +54,18 @@ class UserController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function createAdmin(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $data['role'] = 'admin';
+        $user = User::create($data);
+
+        return response()->json($user, 201);
+    }
 }

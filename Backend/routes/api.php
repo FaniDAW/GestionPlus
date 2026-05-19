@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Solo admin
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::post('users/admin', [UserController::class, 'createAdmin']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('subscriptions', SubscriptionController::class);
     Route::apiResource('invoices', InvoiceController::class);
@@ -58,10 +59,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
 // Solo association_admin
 Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function () {
-    Route::get('/my-group',                        [GroupController::class, 'myGroup']);
-    Route::get('/my-group/available-businesses',   [GroupController::class, 'availableBusinesses']);
-    Route::post('/my-group/businesses',            [GroupController::class, 'myGroupAddBusiness']);
-    Route::post('/my-group/invitation',            [GroupController::class, 'generateInvitation']);
+    Route::get('/my-group',                                [GroupController::class, 'myGroup']);
+    Route::get('/my-group/available-businesses',           [GroupController::class, 'availableBusinesses']);
+    Route::post('/my-group/businesses',                    [GroupController::class, 'myGroupAddBusiness']);
+    Route::patch('/my-group/businesses/{business}',        [GroupController::class, 'myGroupToggleBusiness']);
+    Route::delete('/my-group/businesses/{business}',       [GroupController::class, 'myGroupRemoveBusiness']);
+    Route::post('/my-group/invitation',                    [GroupController::class, 'generateInvitation']);
     Route::get('/points',     [PointController::class, 'index']);
     Route::get('/transactions', [TransactionController::class, 'index']);
 });

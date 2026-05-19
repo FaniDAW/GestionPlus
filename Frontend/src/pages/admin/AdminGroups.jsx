@@ -113,6 +113,25 @@ export default function AdminGroups() {
   const [loading, setLoading]           = useState(true)
   const [formGroup, setFormGroup]       = useState(undefined)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [toggling, setToggling]         = useState(null)
+  const [expanded, setExpanded]         = useState(new Set())
+
+  const toggleExpanded = (id) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+
+  const handleToggle = async (group) => {
+    setToggling(group.id)
+    try {
+      const res = await api.patch(`/groups/${group.id}`, { is_active: !group.is_active })
+      setGroups((prev) => prev.map((g) => g.id === group.id ? { ...g, is_active: res.data.is_active } : g))
+    } finally {
+      setToggling(null)
+    }
+  }
 
   useEffect(() => {
     api.get('/groups')
@@ -185,10 +204,21 @@ export default function AdminGroups() {
               </tr>
             ) : (
               groups.map((group) => (
+                <>
                 <tr key={group.id} className="hover:bg-violet-50/40 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="font-semibold text-slate-800">{group.name}</p>
-                    {group.address && <p className="text-xs text-slate-400 mt-0.5">{group.address}</p>}
+                    <button
+                      onClick={() => toggleExpanded(group.id)}
+                      className="flex items-center gap-2 text-left group"
+                    >
+                      <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform shrink-0 ${expanded.has(group.id) ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                      <div>
+                        <p className="font-semibold text-slate-800 group-hover:text-violet-700 transition-colors">{group.name}</p>
+                        {group.address && <p className="text-xs text-slate-400 mt-0.5">{group.address}</p>}
+                      </div>
+                    </button>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
@@ -213,6 +243,31 @@ export default function AdminGroups() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleToggle(group)}
+                        disabled={toggling === group.id}
+                        title={group.is_active ? 'Desactivar asociación' : 'Activar asociación'}
+                        className={`p-1.5 rounded-lg transition-all disabled:opacity-40 ${
+                          group.is_active
+                            ? 'text-emerald-500 hover:bg-red-50 hover:text-red-500'
+                            : 'text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'
+                        }`}
+                      >
+                        {toggling === group.id ? (
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                        ) : group.is_active ? (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </button>
                       <button onClick={() => setFormGroup(group)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -228,6 +283,44 @@ export default function AdminGroups() {
                     </div>
                   </td>
                 </tr>
+                {expanded.has(group.id) && (
+                  <tr key={`${group.id}-businesses`}>
+                    <td colSpan={6} className="bg-violet-50/40 px-10 py-4">
+                      {!group.businesses?.length ? (
+                        <p className="text-xs text-slate-400 italic">Sin negocios adheridos</p>
+                      ) : (
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-violet-100">
+                              <th className="text-left pb-2 font-semibold text-slate-500 uppercase tracking-wider">Nombre</th>
+                              <th className="text-left pb-2 font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                              <th className="text-left pb-2 font-semibold text-slate-500 uppercase tracking-wider">Teléfono</th>
+                              <th className="text-left pb-2 font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-violet-100">
+                            {group.businesses.map((biz) => (
+                              <tr key={biz.id}>
+                                <td className="py-2 pr-4 font-medium text-slate-800">{biz.name}</td>
+                                <td className="py-2 pr-4 text-slate-500">{biz.email ?? '—'}</td>
+                                <td className="py-2 pr-4 text-slate-500">{biz.phone ?? '—'}</td>
+                                <td className="py-2">
+                                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${
+                                    biz.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                                  }`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${biz.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                                    {biz.is_active ? 'Activo' : 'Inactivo'}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </td>
+                  </tr>
+                )}
+                </>
               ))
             )}
           </tbody>
@@ -252,10 +345,15 @@ export default function AdminGroups() {
           groups.map((group) => (
             <div key={group.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
               <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold text-slate-800">{group.name}</p>
-                  {group.address && <p className="text-xs text-slate-400 mt-0.5">{group.address}</p>}
-                </div>
+                <button onClick={() => toggleExpanded(group.id)} className="flex items-center gap-2 text-left">
+                  <svg className={`w-3.5 h-3.5 text-slate-400 transition-transform shrink-0 mt-0.5 ${expanded.has(group.id) ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-slate-800">{group.name}</p>
+                    {group.address && <p className="text-xs text-slate-400 mt-0.5">{group.address}</p>}
+                  </div>
+                </button>
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shrink-0 ${
                   group.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
                 }`}>
@@ -274,7 +372,55 @@ export default function AdminGroups() {
                 </span>
               </div>
               {group.contact_email && <p className="text-xs text-slate-400">{group.contact_email}</p>}
+              {expanded.has(group.id) && (
+                <div className="border-t border-violet-100 pt-3 space-y-2">
+                  {!group.businesses?.length ? (
+                    <p className="text-xs text-slate-400 italic">Sin negocios adheridos</p>
+                  ) : (
+                    group.businesses.map((biz) => (
+                      <div key={biz.id} className="flex items-center justify-between gap-2 bg-violet-50/50 rounded-xl px-3 py-2">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-slate-800 truncate">{biz.name}</p>
+                          <p className="text-xs text-slate-400 truncate">{biz.email ?? '—'}</p>
+                          {biz.phone && <p className="text-xs text-slate-400">{biz.phone}</p>}
+                        </div>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold shrink-0 ${
+                          biz.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${biz.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                          {biz.is_active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
               <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                <button
+                  onClick={() => handleToggle(group)}
+                  disabled={toggling === group.id}
+                  title={group.is_active ? 'Desactivar' : 'Activar'}
+                  className={`p-1.5 rounded-lg transition-all disabled:opacity-40 ${
+                    group.is_active
+                      ? 'text-emerald-500 hover:bg-red-50 hover:text-red-500'
+                      : 'text-slate-400 hover:bg-emerald-50 hover:text-emerald-600'
+                  }`}
+                >
+                  {toggling === group.id ? (
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                  ) : group.is_active ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                </button>
                 <button onClick={() => setFormGroup(group)}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
