@@ -1,46 +1,58 @@
-import { useEffect, useState } from 'react'
-import { Html5Qrcode } from 'html5-qrcode'
-
-const SCANNER_ID = 'qr-reader-video'
+import { useEffect, useRef, useState } from 'react'
+import { BrowserMultiFormatReader } from '@zxing/browser'
+import { NotFoundException } from '@zxing/library'
 
 export default function QrScanner({ onScan }) {
+  const videoRef = useRef(null)
   const [camError, setCamError] = useState('')
 
   useEffect(() => {
-    let qr = null
-    let scanDone = false
+    let stopped = false
+    let stream = null   // referencia al MediaStream, nunca pierde scope
+    let controls = null // controles del decoder zxing
 
     const stop = () => {
+      stopped = true
+      try { controls?.stop() } catch {}
       try {
-        if (qr && qr.isScanning) qr.stop().catch(() => {})
+        stream?.getTracks().forEach((t) => t.stop())
+        stream = null
       } catch {}
     }
 
-    const onVisibility = () => {
-      if (document.hidden) stop()
-    }
+    const start = async () => {
+      try {
+        // Obtener el stream directamente — así tenemos referencia fiable desde el principio
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' },
+          audio: false,
+        })
 
-    try {
-      qr = new Html5Qrcode(SCANNER_ID)
+        if (stopped) { stop(); return }
 
-      qr.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        (text) => {
-          if (scanDone) return
-          scanDone = true
-          stop()
-          onScan(text)
-        },
-        () => {},
-      ).catch(() =>
+        const reader = new BrowserMultiFormatReader()
+        controls = await reader.decodeFromStream(stream, videoRef.current, (result, err) => {
+          if (stopped) return
+          if (result) {
+            stop()
+            onScan(result.getText())
+          }
+          if (err && !(err instanceof NotFoundException)) {
+            setCamError('No se pudo acceder a la cámara. Comprueba los permisos del navegador.')
+            stop()
+          }
+        })
+
+        if (stopped) stop()
+      } catch {
         setCamError('No se pudo acceder a la cámara. Comprueba los permisos del navegador.')
-      )
-    } catch {
-      setCamError('No se pudo inicializar el escáner. Recarga la página e inténtalo de nuevo.')
+      }
     }
 
+    const onVisibility = () => { if (document.hidden) stop() }
     document.addEventListener('visibilitychange', onVisibility)
+
+    start()
 
     return () => {
       document.removeEventListener('visibilitychange', onVisibility)
@@ -62,10 +74,12 @@ export default function QrScanner({ onScan }) {
 
   return (
     <div>
-      <div
-        id={SCANNER_ID}
-        className="rounded-2xl overflow-hidden bg-black"
+      <video
+        ref={videoRef}
+        className="rounded-2xl w-full bg-black"
         style={{ minHeight: '300px' }}
+        muted
+        playsInline
       />
       <p className="text-xs text-slate-400 text-center mt-3 flex items-center justify-center gap-1.5">
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

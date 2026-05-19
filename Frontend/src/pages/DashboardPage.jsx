@@ -186,7 +186,7 @@ const SCOPE_BADGE = {
   global:     { label: '🌐 Plataforma',    cls: 'bg-blue-100 text-blue-700' },
 }
 
-function OfferCard({ offer, onRedeem }) {
+function OfferCard({ offer, onRedeem, isUsed }) {
   const badge    = SCOPE_BADGE[offer.scope] ?? SCOPE_BADGE.individual
   const [busy, setBusy] = useState(false)
 
@@ -200,20 +200,32 @@ function OfferCard({ offer, onRedeem }) {
   }
 
   return (
-    <div className="relative bg-white rounded-2xl border border-pink-100 shadow-sm p-5 flex flex-col gap-3 hover:shadow-md hover:border-pink-200 transition-all">
+    <div className={`relative bg-white rounded-2xl border shadow-sm p-5 flex flex-col gap-3 transition-all ${
+      isUsed ? 'border-slate-100 opacity-70' : 'border-pink-100 hover:shadow-md hover:border-pink-200'
+    }`}>
       {/* Scope badge — esquina superior derecha */}
-      <span className={`absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${badge.cls}`}>
-        {badge.label}
-      </span>
+      {isUsed ? (
+        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500">
+          ✓ Usado
+        </span>
+      ) : (
+        <span className={`absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${badge.cls}`}>
+          {badge.label}
+        </span>
+      )}
 
       <div className="flex items-start gap-3 pr-28">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center shrink-0 shadow-sm shadow-pink-100">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
+          isUsed ? 'bg-slate-200 shadow-slate-100' : 'bg-gradient-to-br from-pink-400 to-rose-400 shadow-pink-100'
+        }`}>
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
           </svg>
         </div>
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-pink-50 text-pink-600 shrink-0 self-center">
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold shrink-0 self-center ${
+          isUsed ? 'bg-slate-100 text-slate-400' : 'bg-pink-50 text-pink-600'
+        }`}>
           {discountLabel(offer)}
         </span>
       </div>
@@ -231,10 +243,14 @@ function OfferCard({ offer, onRedeem }) {
       </div>
       <button
         onClick={handleUse}
-        disabled={busy}
-        className="w-full py-2 rounded-xl bg-gradient-to-r from-pink-500 to-rose-400 text-white text-xs font-bold hover:shadow-md hover:shadow-pink-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={busy || isUsed}
+        className={`w-full py-2 rounded-xl text-xs font-bold transition-all disabled:cursor-not-allowed ${
+          isUsed
+            ? 'bg-slate-100 text-slate-400'
+            : 'bg-gradient-to-r from-pink-500 to-rose-400 text-white hover:shadow-md hover:shadow-pink-200 disabled:opacity-50'
+        }`}
       >
-        {busy ? 'Generando...' : 'Usar oferta'}
+        {busy ? 'Generando...' : isUsed ? 'Ya utilizada' : 'Usar oferta'}
       </button>
     </div>
   )
@@ -395,6 +411,7 @@ export default function DashboardPage() {
   const [rewards, setRewards]         = useState([])
   const [loading, setLoading]         = useState(true)
   const [redeemResult, setRedeemResult] = useState(null)  // modal data
+  const [usedOfferIds, setUsedOfferIds] = useState(new Set())
 
   useEffect(() => {
     Promise.all([api.get('/me'), api.get('/offers')])
@@ -434,6 +451,7 @@ export default function DashboardPage() {
       redeemable_type: 'offer',
       redeemable_id:   offer.id,
     })
+    setUsedOfferIds((prev) => new Set([...prev, offer.id]))
     setRedeemResult(res.data)
   }, [])
 
@@ -562,7 +580,7 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {offers.map((offer) => (
-                <OfferCard key={offer.id} offer={offer} onRedeem={handleRedeemOffer} />
+                <OfferCard key={offer.id} offer={offer} onRedeem={handleRedeemOffer} isUsed={usedOfferIds.has(offer.id)} />
               ))}
             </div>
           )}

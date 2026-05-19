@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../../lib/api'
+import ConfirmDialog from '../../components/ConfirmDialog'
 
 // ─── Modal: añadir negocio existente ────────────────────────────────────────
 
@@ -306,6 +307,8 @@ export default function AssociationBusinesses() {
   const [group, setGroup]         = useState(null)
   const [loading, setLoading]     = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [deleteBiz, setDeleteBiz] = useState(null)
+  const [toggling, setToggling]   = useState(null)
 
   const loadGroup = () => {
     setLoading(true)
@@ -315,6 +318,28 @@ export default function AssociationBusinesses() {
   }
 
   useEffect(() => { loadGroup() }, [])
+
+  const handleToggle = async (biz) => {
+    setToggling(biz.id)
+    try {
+      const res = await api.patch(`/my-group/businesses/${biz.id}`)
+      setGroup((prev) => ({
+        ...prev,
+        businesses: prev.businesses.map((b) => b.id === biz.id ? res.data : b),
+      }))
+    } finally {
+      setToggling(null)
+    }
+  }
+
+  const handleRemove = async () => {
+    await api.delete(`/my-group/businesses/${deleteBiz.id}`)
+    setGroup((prev) => ({
+      ...prev,
+      businesses: prev.businesses.filter((b) => b.id !== deleteBiz.id),
+    }))
+    setDeleteBiz(null)
+  }
 
   const businesses = group?.businesses ?? []
   const max        = group?.max_businesses ?? null
@@ -329,6 +354,16 @@ export default function AssociationBusinesses() {
           onAdded={() => { setShowModal(false); loadGroup() }}
         />
       )}
+
+      <ConfirmDialog
+        open={!!deleteBiz}
+        danger
+        title="Eliminar negocio de la asociación"
+        message={`¿Eliminar "${deleteBiz?.name}" de la asociación? El negocio no se eliminará del sistema, solo dejará de pertenecer a este grupo.`}
+        confirmLabel="Eliminar"
+        onConfirm={handleRemove}
+        onCancel={() => setDeleteBiz(null)}
+      />
 
       {/* Page header */}
       <div className="flex items-center justify-between">
@@ -377,6 +412,7 @@ export default function AssociationBusinesses() {
               <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
               <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Teléfono</th>
               <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
+              <th className="px-6 py-3.5" />
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -388,11 +424,12 @@ export default function AssociationBusinesses() {
                       <div className="h-4 bg-slate-100 rounded-lg animate-pulse w-28" />
                     </td>
                   ))}
+                  <td className="px-6 py-4"><div className="h-8 bg-slate-100 rounded-xl animate-pulse w-16" /></td>
                 </tr>
               ))
             ) : businesses.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-14 text-center">
+                <td colSpan={6} className="px-6 py-14 text-center">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto mb-3">
                     <svg className="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -422,6 +459,44 @@ export default function AssociationBusinesses() {
                       <span className={`w-1.5 h-1.5 rounded-full ${biz.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`} />
                       {biz.is_active ? 'Activo' : 'Inactivo'}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleToggle(biz)}
+                        disabled={toggling === biz.id}
+                        title={biz.is_active ? 'Desactivar negocio' : 'Activar negocio'}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          biz.is_active
+                            ? 'text-emerald-500 hover:bg-emerald-50 hover:text-emerald-700'
+                            : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                        } disabled:opacity-40`}
+                      >
+                        {toggling === biz.id ? (
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                        ) : biz.is_active ? (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setDeleteBiz(biz)}
+                        title="Eliminar de la asociación"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -462,6 +537,27 @@ export default function AssociationBusinesses() {
                   {biz.owner?.name && <span>Propietario: {biz.owner.name}</span>}
                   {biz.email && <span>{biz.email}</span>}
                   {biz.phone && <span>{biz.phone}</span>}
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    onClick={() => handleToggle(biz)}
+                    disabled={toggling === biz.id}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                      biz.is_active
+                        ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    } disabled:opacity-40`}
+                  >
+                    {biz.is_active ? 'Desactivar' : 'Activar'}
+                  </button>
+                  <button
+                    onClick={() => setDeleteBiz(biz)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             ))

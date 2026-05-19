@@ -49,6 +49,11 @@ export default function BusinessOffers() {
     setDeleteTarget(null)
   }
 
+  const handleToggle = async (offer) => {
+    const res = await api.patch(`/offers/${offer.id}`, { is_active: !offer.is_active })
+    setOffers((prev) => prev.map((o) => o.id === offer.id ? res.data : o))
+  }
+
   return (
     <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6 md:mb-8">
@@ -130,6 +135,25 @@ export default function BusinessOffers() {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <button
+                        onClick={() => handleToggle(offer)}
+                        title={offer.is_active ? 'Desactivar oferta' : 'Activar oferta'}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          offer.is_active
+                            ? 'text-emerald-500 hover:bg-emerald-50 hover:text-emerald-700'
+                            : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+                        }`}
+                      >
+                        {offer.is_active ? (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                      </button>
+                      <button
                         onClick={() => setFormOffer(offer)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all"
                       >
@@ -192,6 +216,20 @@ export default function BusinessOffers() {
                 </span>
               </div>
               <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                <button onClick={() => handleToggle(offer)}
+                  title={offer.is_active ? 'Desactivar' : 'Activar'}
+                  className={`p-1.5 rounded-lg transition-all ${offer.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-slate-400 hover:bg-slate-100'}`}>
+                  {offer.is_active ? (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                </button>
                 <button onClick={() => setFormOffer(offer)}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-all">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

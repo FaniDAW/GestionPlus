@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import api from '../../lib/api'
 import QrScanner from '../../components/QrScanner'
 
@@ -166,7 +166,7 @@ export default function BusinessScanner() {
     else         { setSuccessMsg(msg);  setTimeout(() => setSuccessMsg(''), 3500) }
   }
 
-  const handleScan = async (code) => {
+  const handleScan = useCallback(async (code) => {
     const normalized = code.trim().toUpperCase()
 
     // ── Código de canje (QR de recompensa o uso de oferta) ──
@@ -194,7 +194,7 @@ export default function BusinessScanner() {
       setScanError(err.response?.data?.message || 'Código QR no reconocido.')
       setPhase('idle')
     }
-  }
+  }, [])
 
   const handleAssignPoints = async () => {
     const pts = parseInt(assignPts, 10)
