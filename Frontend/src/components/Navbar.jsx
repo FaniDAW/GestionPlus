@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getDashboardPath } from '../lib/roles'
 
@@ -10,11 +10,19 @@ const sections = [
   { label: 'Testimonios',     id: 'testimonios' },
 ]
 
-const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const handleSection = (id) => {
+    if (location.pathname === '/') {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      navigate('/', { state: { scrollTo: id } })
+    }
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-violet-100">
@@ -32,7 +40,7 @@ export default function Navbar() {
           {sections.map((item) => (
             <button
               key={item.id}
-              onClick={() => scrollTo(item.id)}
+              onClick={() => handleSection(item.id)}
               className="text-sm text-slate-600 hover:text-violet-600 transition-colors font-medium"
             >
               {item.label}
@@ -84,7 +92,7 @@ export default function Navbar() {
           {sections.map((item) => (
             <button
               key={item.id}
-              onClick={() => { scrollTo(item.id); setOpen(false) }}
+              onClick={() => { handleSection(item.id); setOpen(false) }}
               className="text-sm text-slate-600 hover:text-violet-600 font-medium text-left"
             >
               {item.label}

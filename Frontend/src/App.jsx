@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { getDashboardPath } from './lib/roles'
 import Navbar from './components/Navbar'
@@ -26,6 +27,14 @@ import AssociationOverview from './pages/association/AssociationOverview'
 import AssociationBusinesses from './pages/association/AssociationBusinesses'
 import AssociationOffers from './pages/association/AssociationOffers'
 
+import ContactPage from './pages/ContactPage'
+import SobreNosotrosPage from './pages/SobreNosotrosPage'
+import BlogPage from './pages/BlogPage'
+import ClientesPage from './pages/ClientesPage'
+import PrivacidadPage from './pages/PrivacidadPage'
+import TerminosPage from './pages/TerminosPage'
+import CookiesPage from './pages/CookiesPage'
+import AyudaPage from './pages/AyudaPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminOverview from './pages/admin/AdminOverview'
 import AdminBusinesses from './pages/admin/AdminBusinesses'
@@ -43,6 +52,17 @@ function Spinner() {
 }
 
 function LandingPage() {
+  const location = useLocation()
+
+  useEffect(() => {
+    const id = location.state?.scrollTo
+    if (!id) return
+    const timer = setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    }, 80)
+    return () => clearTimeout(timer)
+  }, [location.state])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -84,6 +104,14 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/contacto"       element={<ContactPage />} />
+      <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+      <Route path="/blog"           element={<BlogPage />} />
+      <Route path="/clientes"       element={<ClientesPage />} />
+      <Route path="/privacidad"     element={<PrivacidadPage />} />
+      <Route path="/terminos"       element={<TerminosPage />} />
+      <Route path="/cookies"        element={<CookiesPage />} />
+      <Route path="/ayuda"          element={<AyudaPage />} />
 
       <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />

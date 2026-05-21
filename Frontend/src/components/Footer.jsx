@@ -1,5 +1,19 @@
-const links = {
-  Producto: ['Características', 'Precios', 'Integraciones', 'Changelog', 'Roadmap'],
+import { Link } from 'react-router-dom'
+
+const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+const routes = {
+  'Sobre nosotros': '/sobre-nosotros',
+  'Blog': '/blog',
+  'Clientes': '/clientes',
+  'Contacto': '/contacto',
+  'Privacidad': '/privacidad',
+  'Términos de uso': '/terminos',
+  'Cookies': '/cookies',
+  'Centro de ayuda': '/ayuda',
+}
+
+const otherLinks = {
   Empresa: ['Sobre nosotros', 'Blog', 'Clientes', 'Prensa', 'Contacto'],
   Legal: ['Privacidad', 'Términos de uso', 'Cookies', 'RGPD'],
   Soporte: ['Centro de ayuda', 'Documentación', 'API', 'Status', 'Comunidad'],
@@ -43,16 +57,49 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Links */}
-          {Object.entries(links).map(([section, items]) => (
+          {/* Producto */}
+          <div>
+            <h4 className="text-white font-semibold text-sm mb-4">Producto</h4>
+            <ul className="space-y-3">
+              <li>
+                <button onClick={() => scrollTo('características')} className="text-sm hover:text-violet-400 transition-colors">
+                  Características
+                </button>
+              </li>
+              <li>
+                <button onClick={() => scrollTo('cómo-funciona')} className="text-sm hover:text-violet-400 transition-colors">
+                  Cómo funciona
+                </button>
+              </li>
+              <li>
+                <button onClick={() => scrollTo('precios')} className="text-sm hover:text-violet-400 transition-colors">
+                  Precios
+                </button>
+              </li>
+              <li>
+                <button onClick={() => scrollTo('testimonios')} className="text-sm hover:text-violet-400 transition-colors">
+                  Testimonios
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Other links */}
+          {Object.entries(otherLinks).map(([section, items]) => (
             <div key={section}>
               <h4 className="text-white font-semibold text-sm mb-4">{section}</h4>
               <ul className="space-y-3">
                 {items.map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-sm hover:text-violet-400 transition-colors">
-                      {item}
-                    </a>
+                    {routes[item] ? (
+                      <Link to={routes[item]} className="text-sm hover:text-violet-400 transition-colors">
+                        {item}
+                      </Link>
+                    ) : (
+                      <a href="#" className="text-sm hover:text-violet-400 transition-colors">
+                        {item}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
