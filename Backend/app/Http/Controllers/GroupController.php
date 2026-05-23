@@ -127,6 +127,36 @@ class GroupController extends Controller
         ]);
     }
 
+    public function myGroupToggleBusiness(Request $request, Business $business): JsonResponse
+    {
+        $group = $request->user()->group;
+
+        if (! $group || ! $group->businesses()->where('businesses.id', $business->id)->exists()) {
+            return response()->json(['message' => 'Este negocio no pertenece a tu asociación.'], 403);
+        }
+
+        $business->update(['is_active' => ! $business->is_active]);
+
+        return response()->json($business->load('owner'));
+    }
+
+    public function myGroupRemoveBusiness(Request $request, Business $business): JsonResponse
+    {
+        $group = $request->user()->group;
+
+        if (! $group) {
+            return response()->json(['message' => 'No tienes un grupo asignado.'], 404);
+        }
+
+        if (! $group->businesses()->where('businesses.id', $business->id)->exists()) {
+            return response()->json(['message' => 'Este negocio no pertenece a tu asociación.'], 403);
+        }
+
+        $group->businesses()->detach($business->id);
+
+        return response()->json(null, 204);
+    }
+
     public function myGroupAddBusiness(Request $request): JsonResponse
     {
         $group = $request->user()->group;

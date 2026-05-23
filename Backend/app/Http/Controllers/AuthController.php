@@ -48,7 +48,9 @@ class AuthController extends Controller
 
             $role = 'business_owner';
         } elseif (! empty($data['plan'])) {
-            $role = 'business_owner';
+            $role = in_array($data['plan'], ['association_s', 'association_m', 'municipal'])
+                ? 'association_admin'
+                : 'business_owner';
         }
 
         $user = User::create([
@@ -71,7 +73,7 @@ class AuthController extends Controller
             ]);
 
             $group->businesses()->attach($business->id);
-        } elseif (! empty($data['plan'])) {
+        } elseif (($data['plan'] ?? null) === 'individual') {
             Business::create([
                 'name'      => $businessName,
                 'email'     => $data['email'],
