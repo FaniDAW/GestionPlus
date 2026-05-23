@@ -27,13 +27,13 @@ export default function CTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button to="/register?plan=individual" variant="white">Registrar mi negocio</Button>
-              <Button to="/register" variant="outline">Soy cliente, quiero puntos</Button>
+              <Button to="/register" variant="white">Registrar mi negocio</Button>
+              <Button to="/register?plan=customer" variant="outline">Soy cliente, quiero puntos</Button>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
               {[
-                '✓ Sin tarjeta de crédito',
+                '✓ 14 días de prueba gratis',
                 '✓ Cancela cuando quieras',
                 '✓ Configuración en 30 min',
               ].map((item) => (

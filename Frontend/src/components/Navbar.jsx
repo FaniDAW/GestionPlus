@@ -63,7 +63,7 @@ export default function Navbar() {
                 Iniciar sesión
               </Link>
               <Link
-                to="/register"
+                to="/register?plan=customer"
                 className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all"
               >
                 Empieza gratis
@@ -116,7 +116,7 @@ export default function Navbar() {
                 Iniciar sesión
               </Link>
               <Link
-                to="/register"
+                to="/register?plan=customer"
                 onClick={() => setOpen(false)}
                 className="bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl text-center"
               >
