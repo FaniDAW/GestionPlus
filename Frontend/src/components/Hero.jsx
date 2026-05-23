@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import Button from './ui/Button'
+import AnimateOnScroll from './AnimateOnScroll'
 
 export default function Hero() {
   return (
@@ -11,7 +12,7 @@ export default function Hero() {
       <div className="relative max-w-7xl mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           {/* Text */}
-          <div className="flex-1 text-center lg:text-left">
+          <AnimateOnScroll from="left" className="flex-1 text-center lg:text-left">
             <span className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
               Para negocios individuales y asociaciones de comerciantes
@@ -31,22 +32,8 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link
-                to="/register"
-                className="bg-linear-to-r from-violet-500 to-pink-500 text-white font-bold px-8 py-4 rounded-2xl hover:shadow-xl hover:shadow-violet-200 transition-all text-center"
-              >
-                Empieza gratis — 14 días
-              </Link>
-              <button
-                onClick={() => document.getElementById('cómo-funciona')?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex items-center justify-center gap-2 bg-white text-slate-700 font-semibold px-8 py-4 rounded-2xl border border-slate-200 hover:border-violet-300 hover:text-violet-600 transition-all"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Ver demo
-              </button>
+              <Button to="/register">Empieza gratis — 14 días</Button>
+
             </div>
 
             <div className="mt-10 flex items-center gap-6 justify-center lg:justify-start">
@@ -61,10 +48,10 @@ export default function Hero() {
                 <span className="font-bold text-slate-700">+2.400</span> negocios y asociaciones confían en Gestion+
               </p>
             </div>
-          </div>
+          </AnimateOnScroll>
 
           {/* Dashboard mockup */}
-          <div className="flex-1 w-full max-w-lg lg:max-w-none">
+          <AnimateOnScroll from="zoom" delay={0.2} className="flex-1 w-full max-w-lg lg:max-w-none">
             <div className="relative">
               <div className="bg-white rounded-3xl shadow-2xl shadow-violet-100 p-6 border border-violet-50">
                 {/* Top bar */}
@@ -165,7 +152,7 @@ export default function Hero() {
                 </div>
               </div>
             </div>
-          </div>
+          </AnimateOnScroll>
         </div>
       </div>
     </section>

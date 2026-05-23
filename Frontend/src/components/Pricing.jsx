@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import Button from './ui/Button'
+import AnimateOnScroll from './AnimateOnScroll'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../lib/api'
@@ -222,25 +224,14 @@ function PlanCard({ plan, annual, onCta, loading }) {
         )}
       </div>
 
-      <button
+      <Button
+        variant={plan.highlight ? 'gradient' : 'dark'}
         onClick={() => onCta(plan)}
-        disabled={loading}
-        className={`w-full font-bold py-3 rounded-2xl transition-all mb-8 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
-          plan.highlight
-            ? 'bg-gradient-to-r from-violet-500 to-pink-500 text-white hover:shadow-lg hover:shadow-violet-200'
-            : 'bg-slate-800 hover:bg-slate-700 text-white'
-        }`}
+        loading={loading}
+        className="w-full mb-8"
       >
-        {loading ? (
-          <>
-            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            Redirigiendo...
-          </>
-        ) : plan.id ? 'Empezar prueba gratis' : 'Hablar con ventas'}
-      </button>
+        {plan.id ? 'Empezar prueba gratis' : 'Hablar con ventas'}
+      </Button>
 
       <ul className="space-y-3 mt-auto">
         {plan.features.map((f) => (
@@ -283,7 +274,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
-        <div className="text-center mb-12">
+        <AnimateOnScroll from="bottom" className="text-center mb-12">
           <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
             Precios
           </span>
@@ -312,19 +303,19 @@ export default function Pricing() {
               <span className="ml-2 bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full">-20%</span>
             </button>
           </div>
-        </div>
+        </AnimateOnScroll>
 
         {/* — Para negocios — */}
         <div className="mb-14">
-          <div className="flex items-center gap-4 mb-8">
+          <AnimateOnScroll from="bottom" className="flex items-center gap-4 mb-8">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-violet-500" />
               <span className="text-sm font-bold text-slate-700 uppercase tracking-wide">Para negocios</span>
             </div>
             <div className="flex-1 h-px bg-slate-100" />
-          </div>
+          </AnimateOnScroll>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <AnimateOnScroll from="zoom" className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             {/* Plan card */}
             <div>
               {individualPlans.map((plan) => (
@@ -340,20 +331,20 @@ export default function Pricing() {
 
             {/* Mockup negocio animado */}
             <BusinessMockup />
-          </div>
+          </AnimateOnScroll>
         </div>
 
         {/* — Para asociaciones y ayuntamientos — */}
         <div>
-          <div className="flex items-center gap-4 mb-8">
+          <AnimateOnScroll from="bottom" className="flex items-center gap-4 mb-8">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500" />
               <span className="text-sm font-bold text-slate-700 uppercase tracking-wide">Para asociaciones y ayuntamientos</span>
             </div>
             <div className="flex-1 h-px bg-slate-100" />
-          </div>
+          </AnimateOnScroll>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+          <AnimateOnScroll from="zoom" className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
             {groupPlans.map((plan) => (
               <PlanCard
                 key={plan.name}
@@ -363,7 +354,7 @@ export default function Pricing() {
                 loading={loadingPlan === plan.id}
               />
             ))}
-          </div>
+          </AnimateOnScroll>
         </div>
 
         <p className="text-center text-sm text-slate-400 mt-12">

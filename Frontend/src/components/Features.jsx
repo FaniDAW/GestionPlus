@@ -1,3 +1,5 @@
+import AnimateOnScroll from './AnimateOnScroll'
+
 const features = [
   {
     icon: (
@@ -90,7 +92,7 @@ export default function Features() {
   return (
     <section id="características" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <AnimateOnScroll from="bottom" className="text-center mb-16">
           <span className="inline-block bg-pink-100 text-pink-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
             Características
           </span>
@@ -103,25 +105,31 @@ export default function Features() {
           <p className="text-slate-500 max-w-xl mx-auto text-lg">
             Herramientas potentes, configuradas en minutos. Sin conocimientos técnicos.
           </p>
-        </div>
+        </AnimateOnScroll>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className={`relative bg-gradient-to-br ${f.color} rounded-3xl p-6 border border-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group`}
-            >
-              {f.tag && (
-                <span className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full ${f.tag}`}>
-                  {f.tagText}
-                </span>
-              )}
-              <div className={`w-12 h-12 ${f.iconBg} ${f.iconColor} rounded-2xl flex items-center justify-center mb-4`}>
-                {f.icon}
+        <div className="flex flex-col gap-6">
+          {[features.slice(0, 3), features.slice(3, 6)].map((row, rowIndex) => (
+            <AnimateOnScroll key={rowIndex} from="zoom" delay={rowIndex * 0.15}>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {row.map((f) => (
+                  <div
+                    key={f.title}
+                    className={`relative bg-gradient-to-br ${f.color} rounded-3xl p-6 border border-white hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group`}
+                  >
+                    {f.tag && (
+                      <span className={`absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full ${f.tag}`}>
+                        {f.tagText}
+                      </span>
+                    )}
+                    <div className={`w-12 h-12 ${f.iconBg} ${f.iconColor} rounded-2xl flex items-center justify-center mb-4`}>
+                      {f.icon}
+                    </div>
+                    <h3 className="text-base font-bold text-slate-800 mb-2">{f.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{f.description}</p>
+                  </div>
+                ))}
               </div>
-              <h3 className="text-base font-bold text-slate-800 mb-2">{f.title}</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">{f.description}</p>
-            </div>
+            </AnimateOnScroll>
           ))}
         </div>
       </div>

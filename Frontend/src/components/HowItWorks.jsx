@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom'
+import AnimateOnScroll from './AnimateOnScroll'
+import Button from './ui/Button'
 
 const steps = [
   {
     number: '01',
+    from: 'left',
     title: 'Crea tu programa',
     description: 'Registra tu negocio en minutos. Define tus reglas de puntos, recompensas y colores de marca.',
     icon: (
@@ -20,6 +22,7 @@ const steps = [
   },
   {
     number: '02',
+    from: 'bottom',
     title: 'Tus clientes participan',
     description: 'Comparten su número o escanean QR en cada compra. Acumulan puntos automáticamente, sin apps extra.',
     icon: (
@@ -36,6 +39,7 @@ const steps = [
   },
   {
     number: '03',
+    from: 'right',
     title: 'Canjean y vuelven',
     description: 'Cuando acumulan suficientes puntos, canjean sus recompensas. Tú ves todo en tu dashboard.',
     icon: (
@@ -56,7 +60,7 @@ export default function HowItWorks() {
   return (
     <section id="cómo-funciona" className="py-24 bg-gradient-to-br from-slate-50 to-violet-50">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <AnimateOnScroll from="bottom" className="text-center mb-16">
           <span className="inline-block bg-violet-100 text-violet-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
             Cómo funciona
           </span>
@@ -69,14 +73,14 @@ export default function HowItWorks() {
           <p className="text-slate-500 max-w-xl mx-auto text-lg">
             Sin instalaciones, sin complicaciones. Solo configura y empieza a fidelizar.
           </p>
-        </div>
+        </AnimateOnScroll>
 
         <div className="relative">
           <div className="hidden lg:block absolute top-10 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-200 via-pink-200 to-emerald-200 mx-48" />
 
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, i) => (
-              <div key={i} className="flex flex-col items-center text-center relative">
+              <AnimateOnScroll key={i} from={step.from} delay={i * 0.15} className="flex flex-col items-center text-center relative">
                 <div className={`relative w-20 h-20 ${step.iconBg} ${step.ringColor} border-2 rounded-2xl flex items-center justify-center ${step.iconColor} mb-6 z-10`}>
                   {step.icon}
                   <span className={`absolute -top-2.5 -right-2.5 w-6 h-6 ${step.dotColor} rounded-full flex items-center justify-center text-xs font-black text-white`}>
@@ -88,21 +92,18 @@ export default function HowItWorks() {
                   <h3 className="text-lg font-bold text-slate-800 mb-3">{step.title}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed">{step.description}</p>
                 </div>
-              </div>
+              </AnimateOnScroll>
             ))}
           </div>
         </div>
 
         <div className="mt-16 text-center">
-          <Link
-            to="/register"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold px-8 py-4 rounded-2xl hover:shadow-xl hover:shadow-violet-200 transition-all"
-          >
+          <Button to="/register">
             Empieza ahora gratis
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </Link>
+          </Button>
         </div>
       </div>
     </section>

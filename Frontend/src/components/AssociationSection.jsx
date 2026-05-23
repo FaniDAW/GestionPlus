@@ -1,10 +1,12 @@
+import AnimateOnScroll from './AnimateOnScroll'
+
 export default function AssociationSection() {
   return (
     <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-violet-50/30 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
-        <div className="text-center mb-16">
+        <AnimateOnScroll from="bottom" className="text-center mb-16">
           <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
             Para asociaciones y ayuntamientos
           </span>
@@ -19,10 +21,10 @@ export default function AssociationSection() {
             fidelización compartido para todos los comercios del grupo. Un solo saldo de puntos,
             válido en toda la red.
           </p>
-        </div>
+        </AnimateOnScroll>
 
         {/* Feature cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <AnimateOnScroll from="zoom" className="grid md:grid-cols-3 gap-8 mb-16">
           {[
             {
               icon: (
@@ -69,10 +71,10 @@ export default function AssociationSection() {
               <p className="text-sm text-slate-500 leading-relaxed">{item.body}</p>
             </div>
           ))}
-        </div>
+        </AnimateOnScroll>
 
         {/* Comparison strip */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <AnimateOnScroll from="zoom" delay={0.15} className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
 
             {/* Individual */}
@@ -138,7 +140,7 @@ export default function AssociationSection() {
               </ul>
             </div>
           </div>
-        </div>
+        </AnimateOnScroll>
 
       </div>
     </section>

@@ -1,3 +1,5 @@
+import AnimateOnScroll from './AnimateOnScroll'
+
 const testimonials = [
   {
     name: 'Sofía Martínez',
@@ -69,11 +71,8 @@ export default function Testimonials() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-            <div
-              key={t.name}
-              className="bg-white rounded-3xl p-6 border border-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-            >
+          {testimonials.map((t, index) => (
+            <AnimateOnScroll key={t.name} from="right" delay={index * 0.1} className="bg-white rounded-3xl p-6 border border-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
               {/* Stars */}
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: t.stars }).map((_, i) => (
@@ -94,7 +93,7 @@ export default function Testimonials() {
                   <p className="text-xs text-slate-400">{t.role}</p>
                 </div>
               </div>
-            </div>
+            </AnimateOnScroll>
           ))}
         </div>
 
