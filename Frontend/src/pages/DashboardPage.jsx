@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../lib/api'
 import QRCode from 'qrcode'
@@ -256,9 +256,17 @@ function OfferCard({ offer, onRedeem, isUsed }) {
   )
 }
 
-function QrSection() {
+function QrSection({ loyaltyCode }) {
   const [qrSvg, setQrSvg]     = useState(null)
   const [qrError, setQrError] = useState(false)
+  const [copied, setCopied]   = useState(false)
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(loyaltyCode).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
 
   useEffect(() => {
     api.get('/me/qr', { responseType: 'text', headers: { Accept: 'image/svg+xml' } })
@@ -313,7 +321,7 @@ function QrSection() {
           </button>
         </div>
 
-        {/* Texto explicativo */}
+        {/* Texto explicativo + código de fidelización */}
         <div className="flex-1 text-center sm:text-left">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center mb-4 mx-auto sm:mx-0 shadow-sm shadow-pink-200">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,6 +336,34 @@ function QrSection() {
             El comerciante escaneará tu QR en cada compra y los puntos se añadirán automáticamente a tu saldo.
             No necesitas ninguna app extra.
           </p>
+
+          {/* Código de fidelización */}
+          {loyaltyCode && (
+            <div className="mb-4 bg-gradient-to-r from-violet-50 to-pink-50 border border-violet-100 rounded-2xl px-5 py-4">
+              <p className="text-xs font-semibold text-slate-500 mb-1.5">Código de fidelización</p>
+              <div className="flex items-center gap-3 justify-center sm:justify-start">
+                <span className="font-mono text-3xl font-black tracking-[0.2em] text-violet-700">{loyaltyCode}</span>
+                <button
+                  onClick={copyCode}
+                  className="p-2 rounded-xl text-violet-400 hover:bg-violet-100 hover:text-violet-600 transition-all"
+                  title="Copiar código"
+                >
+                  {copied ? (
+                    <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-slate-400 mt-1.5">Alternativa al QR si el escáner no funciona</p>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
             {[
               { icon: '🏪', text: 'Válido en todos los negocios adheridos' },
@@ -407,6 +443,7 @@ export default function DashboardPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [points, setPoints]           = useState(null)
+  const [loyaltyCode, setLoyaltyCode] = useState(null)
   const [offers, setOffers]           = useState([])
   const [rewards, setRewards]         = useState([])
   const [loading, setLoading]         = useState(true)
@@ -421,6 +458,7 @@ export default function DashboardPage() {
           total_balance: meRes.data.total_balance ?? 0,
         }
         setPoints(pts)
+        setLoyaltyCode(meRes.data.loyalty_code ?? null)
         setOffers(ofRes.data)
         // Filtrar recompensas por el grupo del cliente para evitar mostrar
         // recompensas de negocios fuera de su red
@@ -469,16 +507,24 @@ export default function DashboardPage() {
       <header className="bg-white border-b border-pink-100 shadow-sm shadow-pink-50/50 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-rose-400 flex items-center justify-center shadow-sm shadow-pink-200">
-              <span className="text-white font-black text-sm">G</span>
-            </div>
-            <span className="font-extrabold text-slate-800 text-lg">Gestion+</span>
+            <img src="/logo.svg" alt="Gestion+" className="h-10 w-auto" />
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
+          <div className="flex items-center gap-2">
+            <div className="text-right hidden sm:block mr-2">
               <p className="text-sm font-semibold text-slate-800">{user?.name}</p>
               <p className="text-xs text-slate-400">{user?.email}</p>
             </div>
+            <Link
+              to="/settings"
+              className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all"
+              title="Configuración"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-500 hover:bg-pink-50 hover:text-pink-600 text-sm font-medium transition-all"
@@ -513,7 +559,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Mi QR */}
-        <QrSection />
+        <QrSection loyaltyCode={loyaltyCode} />
 
         {/* Mis puntos */}
         <section>

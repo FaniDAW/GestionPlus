@@ -35,6 +35,7 @@ import PrivacidadPage from './pages/PrivacidadPage'
 import TerminosPage from './pages/TerminosPage'
 import CookiesPage from './pages/CookiesPage'
 import AyudaPage from './pages/AyudaPage'
+import SettingsPage from './pages/SettingsPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminOverview from './pages/admin/AdminOverview'
 import AdminBusinesses from './pages/admin/AdminBusinesses'
@@ -155,6 +156,9 @@ function AppRoutes() {
         <Route path="groups"        element={<AdminGroups />} />
         <Route path="offers"        element={<AdminOffers />} />
       </Route>
+
+      {/* Settings — any authenticated user */}
+      <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

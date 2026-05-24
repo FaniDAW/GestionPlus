@@ -13,7 +13,7 @@ export default function CTASection() {
 
           <div className="relative z-10">
             <span className="inline-block bg-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-              Sin tarjeta de crédito
+              Te ayyudamos a mejorar tu empresa
             </span>
 
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
@@ -23,7 +23,7 @@ export default function CTASection() {
             </h2>
 
             <p className="text-violet-100 text-lg max-w-xl mx-auto mb-10">
-              Únete a más de 2.400 negocios que ya usan Gestion+ para retener clientes y aumentar sus ingresos.
+              Únete a la red de negocios que ya usan Gestion+ para retener clientes y aumentar sus ingresos.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -202,6 +202,12 @@ function InviteSection({ group, onTokenGenerated }) {
   const [generating, setGenerating] = useState(false)
   const [copied, setCopied]         = useState(false)
 
+  // Email invite state
+  const [email, setEmail]       = useState('')
+  const [sending, setSending]   = useState(false)
+  const [sent, setSent]         = useState(false)
+  const [emailError, setEmailError] = useState('')
+
   const inviteUrl = group?.invitation_token
     ? `${window.location.origin}/register?token=${group.invitation_token}`
     : null
@@ -224,79 +230,171 @@ function InviteSection({ group, onTokenGenerated }) {
     })
   }
 
+  const handleEmailInvite = async (e) => {
+    e.preventDefault()
+    if (!email.trim()) return
+    setSending(true)
+    setEmailError('')
+    setSent(false)
+    try {
+      await api.post('/association/invite', { email: email.trim() })
+      setSent(true)
+      setEmail('')
+      setTimeout(() => setSent(false), 4000)
+    } catch (err) {
+      setEmailError(err.response?.data?.message || 'Error al enviar la invitación.')
+    } finally {
+      setSending(false)
+    }
+  }
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center shrink-0">
-            <svg className="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+
+      {/* ── Invitación por email ── */}
+      <div>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+            <svg className="w-4.5 h-4.5 text-emerald-600 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-sm font-extrabold text-slate-800">Invitar negocio nuevo</h2>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Comparte el enlace para que nuevos negocios se registren directamente en tu asociación
-            </p>
+            <h2 className="text-sm font-extrabold text-slate-800">Invitar por email</h2>
+            <p className="text-xs text-slate-400 mt-0.5">El negocio recibirá un enlace personalizado válido 7 días</p>
           </div>
         </div>
 
-        <button
-          onClick={handleGenerate}
-          disabled={generating}
-          className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
-        >
-          {generating ? (
-            <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        <form onSubmit={handleEmailInvite} className="flex gap-2">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => { setEmail(e.target.value); setEmailError('') }}
+            placeholder="email@negocio.com"
+            required
+            className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 transition-all"
+          />
+          <button
+            type="submit"
+            disabled={sending || !email.trim()}
+            className="shrink-0 flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm hover:shadow-lg hover:shadow-emerald-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {sending ? (
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : sent ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            )}
+            {sending ? 'Enviando...' : sent ? '¡Enviado!' : 'Enviar invitación'}
+          </button>
+        </form>
+
+        {emailError && (
+          <p className="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
+            <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
-          ) : (
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            {emailError}
+          </p>
+        )}
+        {sent && (
+          <p className="mt-2 text-xs text-emerald-600 font-medium flex items-center gap-1">
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
-          )}
-          {inviteUrl ? 'Regenerar' : 'Generar enlace'}
-        </button>
+            Invitación enviada. El negocio recibirá el enlace en su email.
+          </p>
+        )}
       </div>
 
-      {inviteUrl ? (
-        <div className="flex gap-2">
-          <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-600 font-mono truncate">
-            {inviteUrl}
+      {/* ── Divider ── */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-slate-100" />
+        <span className="text-xs text-slate-400 font-medium">o comparte el enlace</span>
+        <div className="flex-1 h-px bg-slate-100" />
+      </div>
+
+      {/* ── Invitación por enlace ── */}
+      <div>
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-sm font-extrabold text-slate-800">Enlace de invitación</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Cualquiera con este enlace puede registrarse en tu asociación</p>
+            </div>
           </div>
+
           <button
-            onClick={handleCopy}
-            className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-              copied
-                ? 'bg-emerald-100 text-emerald-700'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-            }`}
+            onClick={handleGenerate}
+            disabled={generating}
+            className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 px-3 py-2 rounded-xl transition-all disabled:opacity-50"
           >
-            {copied ? (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                ¡Copiado!
-              </>
+            {generating ? (
+              <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
             ) : (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copiar
-              </>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
             )}
+            {inviteUrl ? 'Regenerar' : 'Generar enlace'}
           </button>
         </div>
-      ) : (
-        <p className="text-xs text-slate-400 italic">
-          Genera un enlace para invitar a nuevos negocios. El enlace se puede regenerar en cualquier momento.
-        </p>
-      )}
+
+        {inviteUrl ? (
+          <div className="flex gap-2">
+            <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-600 font-mono truncate">
+              {inviteUrl}
+            </div>
+            <button
+              onClick={handleCopy}
+              className={`shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                copied
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+              }`}
+            >
+              {copied ? (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  ¡Copiado!
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copiar
+                </>
+              )}
+            </button>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400 italic">
+            Genera un enlace para invitar a nuevos negocios. El enlace se puede regenerar en cualquier momento.
+          </p>
+        )}
+      </div>
     </div>
   )
 }

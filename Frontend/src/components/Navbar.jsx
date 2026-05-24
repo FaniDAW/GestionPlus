@@ -28,11 +28,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-violet-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">G</span>
-          </div>
-          <span className="text-xl font-bold text-violet-800">Gestion+</span>
+        <Link to="/" className="flex items-center">
+          <img src="/logo.svg" alt="Gestion+" className="h-12 w-auto" />
         </Link>
 
         {/* Desktop links */}

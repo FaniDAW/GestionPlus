@@ -26,11 +26,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-16">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-400 to-pink-400 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
-              </div>
-              <span className="text-xl font-bold text-white">Gestion+</span>
+            <div className="mb-4">
+              <img src="/logo.svg" alt="Gestion+" className="h-12 w-auto" />
             </div>
             <p className="text-sm leading-relaxed">
               La plataforma de fidelización más fácil para PYMEs y negocios en crecimiento.

@@ -142,6 +142,71 @@ function ValidationResult({ result, onDismiss }) {
   )
 }
 
+function FindCustomerSection({ onFound }) {
+  const [query, setQuery]     = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState('')
+
+  const handleSearch = async (e) => {
+    e.preventDefault()
+    if (!query.trim()) return
+    setLoading(true)
+    setError('')
+    try {
+      const res = await api.post('/scanner/find-customer', { query: query.trim() })
+      setQuery('')
+      onFound(res.data)
+    } catch (err) {
+      setError(err.response?.data?.message ?? 'Cliente no encontrado.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+      <h3 className="font-extrabold text-slate-800 mb-1 flex items-center gap-2">
+        <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+        </svg>
+        O busca por código o email
+      </h3>
+      <p className="text-xs text-slate-400 mb-4">Introduce el código de fidelización de 6 dígitos o el email del cliente.</p>
+
+      <form onSubmit={handleSearch} className="flex gap-3">
+        <input
+          value={query}
+          onChange={(e) => { setQuery(e.target.value); setError('') }}
+          placeholder="123456 o cliente@email.com"
+          className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 focus:bg-white transition-all"
+        />
+        <button
+          type="submit"
+          disabled={loading || !query.trim()}
+          className="px-5 py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-md hover:shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          {loading ? (
+            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          ) : 'Buscar'}
+        </button>
+      </form>
+
+      {error && (
+        <div className="mt-3 flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 rounded-xl px-4 py-3 text-sm">
+          <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
+          {error}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function BusinessScanner() {
   const [phase, setPhase]                 = useState('idle')   // idle | scanning | loading | found
   const [customer, setCustomer]           = useState(null)
@@ -345,6 +410,13 @@ export default function BusinessScanner() {
       {phase === 'loading' && (
         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm">
           <Spinner />
+        </div>
+      )}
+
+      {/* ── Búsqueda por código / email ── */}
+      {phase !== 'scanning' && phase !== 'found' && (
+        <div className="mt-6">
+          <FindCustomerSection onFound={(data) => { setCustomer(data); setPhase('found') }} />
         </div>
       )}
 

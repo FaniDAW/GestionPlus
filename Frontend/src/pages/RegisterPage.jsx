@@ -219,11 +219,8 @@ export default function RegisterPage() {
         <div className="relative w-full max-w-2xl">
           {/* Logo */}
           <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center gap-2">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-violet-200">
-                <span className="text-white font-black text-lg">G</span>
-              </div>
-              <span className="text-2xl font-black text-violet-800">Gestion+</span>
+            <Link to="/">
+              <img src="/logo.svg" alt="Gestion+" className="h-12 w-auto mx-auto" />
             </Link>
             {(plan || invitationToken) && (
                 <>

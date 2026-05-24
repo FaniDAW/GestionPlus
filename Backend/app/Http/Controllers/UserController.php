@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Stripe;
 
 class UserController extends Controller
 {
@@ -53,6 +57,56 @@ class UserController extends Controller
         $user->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // Cancel active subscription if exists
+        $subscription = $this->findActiveSubscription($user);
+        if ($subscription) {
+            if ($subscription->stripe_subscription_id) {
+                try {
+                    Stripe::setApiKey(config('services.stripe.secret'));
+                    \Stripe\Subscription::retrieve($subscription->stripe_subscription_id)->cancel();
+                } catch (ApiErrorException $e) {
+                    Log::warning('Stripe subscription cancel failed: ' . $e->getMessage());
+                }
+            }
+            $subscription->update(['status' => 'cancelled']);
+        }
+
+        // Revoke all tokens before deleting
+        $user->tokens()->delete();
+
+        $user->delete();
+
+        return response()->json(['message' => 'Cuenta eliminada correctamente.']);
+    }
+
+    private function findActiveSubscription(User $user): ?Subscription
+    {
+        // business_owner → subscription via their business
+        if ($user->role === 'business_owner') {
+            $business = $user->businesses()->first();
+            if ($business) {
+                return Subscription::where('business_id', $business->id)
+                    ->whereIn('status', ['active', 'trialing'])
+                    ->latest()
+                    ->first();
+            }
+        }
+
+        // association_admin → subscription via their group
+        if ($user->role === 'association_admin' && $user->group_id) {
+            return Subscription::where('group_id', $user->group_id)
+                ->whereIn('status', ['active', 'trialing'])
+                ->latest()
+                ->first();
+        }
+
+        return null;
     }
 
     public function createAdmin(Request $request): JsonResponse
