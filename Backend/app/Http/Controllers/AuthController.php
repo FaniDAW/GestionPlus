@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\WelcomeMail;
 use App\Models\Business;
 use App\Models\Group;
+use App\Models\GroupInvitation;
 use App\Models\GroupPoint;
 use App\Models\Point;
 use App\Models\User;
@@ -11,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
@@ -32,7 +35,19 @@ class AuthController extends Controller
         $role  = 'customer';
 
         if (! empty($data['invitation_token'])) {
+            // Try link-based token first, then email-based token
             $group = Group::where('invitation_token', $data['invitation_token'])->first();
+
+            if (! $group) {
+                $emailInvitation = GroupInvitation::with('group')
+                    ->where('token', $data['invitation_token'])
+                    ->where('expires_at', '>', now())
+                    ->first();
+
+                if ($emailInvitation) {
+                    $group = $emailInvitation->group;
+                }
+            }
 
             if (! $group) {
                 return response()->json([
@@ -53,13 +68,18 @@ class AuthController extends Controller
                 : 'business_owner';
         }
 
+        do {
+            $loyaltyCode = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        } while (User::where('loyalty_code', $loyaltyCode)->exists());
+
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'phone'    => $data['phone'] ?? null,
-            'role'     => $role,
-            'qr_code'  => Str::uuid()->toString(),
+            'name'         => $data['name'],
+            'email'        => $data['email'],
+            'password'     => Hash::make($data['password']),
+            'phone'        => $data['phone'] ?? null,
+            'role'         => $role,
+            'qr_code'      => Str::uuid()->toString(),
+            'loyalty_code' => $loyaltyCode,
         ]);
 
         $businessName = ! empty($data['business_name']) ? $data['business_name'] : $data['name'];
@@ -73,6 +93,9 @@ class AuthController extends Controller
             ]);
 
             $group->businesses()->attach($business->id);
+
+            // Consume the email-based invitation if it was used
+            GroupInvitation::where('token', $data['invitation_token'] ?? '')->delete();
         } elseif (($data['plan'] ?? null) === 'individual') {
             Business::create([
                 'name'      => $businessName,
@@ -81,6 +104,8 @@ class AuthController extends Controller
                 'is_active' => false,
             ]);
         }
+
+        Mail::to($user->email)->send(new WelcomeMail($user));
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

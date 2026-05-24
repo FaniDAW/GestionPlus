@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'qr_code',
+        'loyalty_code',
         'role',
         'is_active',
         'group_id',

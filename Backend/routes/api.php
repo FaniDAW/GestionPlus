@@ -26,8 +26,9 @@ Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
 
 // Rutas protegidas — cualquier usuario autenticado
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me',      [AuthController::class, 'me']);
+    Route::post('/logout',  [AuthController::class, 'logout']);
+    Route::get('/me',       [AuthController::class, 'me']);
+    Route::delete('/user',  [UserController::class, 'deleteAccount']);
     Route::get('/me/qr',   [QrController::class, 'show']);
 
     Route::post('/stripe/checkout', [StripeController::class, 'createCheckoutSession']);
@@ -65,6 +66,7 @@ Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function ()
     Route::patch('/my-group/businesses/{business}',        [GroupController::class, 'myGroupToggleBusiness']);
     Route::delete('/my-group/businesses/{business}',       [GroupController::class, 'myGroupRemoveBusiness']);
     Route::post('/my-group/invitation',                    [GroupController::class, 'generateInvitation']);
+    Route::post('/association/invite',                     [GroupController::class, 'inviteByEmail']);
     Route::get('/points',     [PointController::class, 'index']);
     Route::get('/transactions', [TransactionController::class, 'index']);
 });
@@ -73,6 +75,7 @@ Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function ()
 Route::middleware(['auth:sanctum', 'role:business_owner'])->group(function () {
     Route::get('/my-business',                              [BusinessController::class, 'myBusiness']);
     Route::get('/qr/scan/{code}',                           [QrController::class, 'scan']);
+    Route::post('/scanner/find-customer',                   [QrController::class, 'findCustomer']);
     Route::post('/transactions/validate-code',              [TransactionController::class, 'validateCode']);
     Route::apiResource('rewards',      RewardController::class)->except(['index']);
     Route::apiResource('points',       PointController::class);

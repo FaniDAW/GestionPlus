@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\BusinessInvitationMail;
 use App\Models\Group;
+use App\Models\GroupInvitation;
 use App\Models\Business;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class GroupController extends Controller
@@ -115,16 +118,57 @@ class GroupController extends Controller
 
     public function resolveInvitation(string $token): JsonResponse
     {
+        // Link-based invitation (group token)
         $group = Group::where('invitation_token', $token)->first();
+        if ($group) {
+            return response()->json(['group_name' => $group->name, 'group_type' => $group->type]);
+        }
 
-        if (! $group) {
+        // Email-based invitation (per-email token)
+        $invitation = GroupInvitation::with('group')
+            ->where('token', $token)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $invitation) {
             return response()->json(['message' => 'Invitación no válida o expirada.'], 404);
         }
 
         return response()->json([
-            'group_name' => $group->name,
-            'group_type' => $group->type,
+            'group_name' => $invitation->group->name,
+            'group_type' => $invitation->group->type,
         ]);
+    }
+
+    public function inviteByEmail(Request $request): JsonResponse
+    {
+        $group = $request->user()->group;
+
+        if (! $group) {
+            return response()->json(['message' => 'No tienes un grupo asignado.'], 404);
+        }
+
+        $data = $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+
+        // Revoke any previous pending invitation for this email in this group
+        GroupInvitation::where('group_id', $group->id)
+            ->where('email', $data['email'])
+            ->delete();
+
+        $invitation = GroupInvitation::create([
+            'group_id'   => $group->id,
+            'email'      => $data['email'],
+            'token'      => Str::uuid()->toString(),
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        $invitation->load('group');
+
+        Mail::to($data['email'])->send(new BusinessInvitationMail($invitation));
+
+        return response()->json(['message' => 'Invitación enviada correctamente.']);
     }
 
     public function myGroupToggleBusiness(Request $request, Business $business): JsonResponse
