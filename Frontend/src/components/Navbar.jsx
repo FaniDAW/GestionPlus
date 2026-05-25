@@ -25,11 +25,11 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-violet-100">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-violet-100 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img src="/logo.svg" alt="Gestion+" className="h-12 w-auto" />
+        <Link to="/" className="flex items-center shrink-0">
+          <img src="/logo.svg" alt="Gestion+" className="h-9 sm:h-12 w-auto max-w-[130px] sm:max-w-none" />
         </Link>
 
         {/* Desktop links */}
@@ -85,7 +85,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-white border-t border-violet-100 px-6 py-4 flex flex-col gap-4">
+        <div className="md:hidden bg-white border-t border-violet-100 px-4 sm:px-6 py-4 flex flex-col gap-4">
           {sections.map((item) => (
             <button
               key={item.id}

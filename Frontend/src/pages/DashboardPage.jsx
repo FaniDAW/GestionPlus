@@ -186,8 +186,8 @@ const SCOPE_BADGE = {
   global:     { label: '🌐 Plataforma',    cls: 'bg-blue-100 text-blue-700' },
 }
 
-function OfferCard({ offer, onRedeem, isUsed }) {
-  const badge    = SCOPE_BADGE[offer.scope] ?? SCOPE_BADGE.individual
+function OfferCard({ offer, onRedeem }) {
+  const badge = SCOPE_BADGE[offer.scope] ?? SCOPE_BADGE.individual
   const [busy, setBusy] = useState(false)
 
   const handleUse = async () => {
@@ -200,57 +200,43 @@ function OfferCard({ offer, onRedeem, isUsed }) {
   }
 
   return (
-    <div className={`relative bg-white rounded-2xl border shadow-sm p-5 flex flex-col gap-3 transition-all ${
-      isUsed ? 'border-slate-100 opacity-70' : 'border-pink-100 hover:shadow-md hover:border-pink-200'
-    }`}>
-      {/* Scope badge — esquina superior derecha */}
-      {isUsed ? (
-        <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500">
-          ✓ Usado
-        </span>
-      ) : (
-        <span className={`absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${badge.cls}`}>
-          {badge.label}
-        </span>
-      )}
+    <div className="relative bg-white rounded-2xl border border-pink-100 shadow-sm p-5 flex flex-col gap-3 transition-all hover:shadow-md hover:border-pink-200">
+      <span className={`absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${badge.cls}`}>
+        {badge.label}
+      </span>
 
       <div className="flex items-start gap-3 pr-28">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
-          isUsed ? 'bg-slate-200 shadow-slate-100' : 'bg-gradient-to-br from-pink-400 to-rose-400 shadow-pink-100'
-        }`}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm bg-gradient-to-br from-pink-400 to-rose-400 shadow-pink-100">
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
           </svg>
         </div>
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold shrink-0 self-center ${
-          isUsed ? 'bg-slate-100 text-slate-400' : 'bg-pink-50 text-pink-600'
-        }`}>
+        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold shrink-0 self-center bg-pink-50 text-pink-600">
           {discountLabel(offer)}
         </span>
       </div>
+
       <div className="flex-1">
         <p className="font-bold text-slate-800 leading-snug">{offer.title}</p>
         {offer.description && (
           <p className="text-xs text-slate-400 mt-1 line-clamp-2">{offer.description}</p>
         )}
       </div>
+
       <div className="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-50">
         <span>{offer.business?.name ?? offer.group?.name ?? 'Plataforma'}</span>
         {offer.ends_at && (
           <span>Hasta {new Date(offer.ends_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}</span>
         )}
       </div>
+
       <button
         onClick={handleUse}
-        disabled={busy || isUsed}
-        className={`w-full py-2 rounded-xl text-xs font-bold transition-all disabled:cursor-not-allowed ${
-          isUsed
-            ? 'bg-slate-100 text-slate-400'
-            : 'bg-gradient-to-r from-pink-500 to-rose-400 text-white hover:shadow-md hover:shadow-pink-200 disabled:opacity-50'
-        }`}
+        disabled={busy}
+        className="w-full py-2 rounded-xl text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-pink-500 to-rose-400 text-white hover:shadow-md hover:shadow-pink-200"
       >
-        {busy ? 'Generando...' : isUsed ? 'Ya utilizada' : 'Usar oferta'}
+        {busy ? 'Generando...' : 'Usar oferta'}
       </button>
     </div>
   )
@@ -448,24 +434,18 @@ export default function DashboardPage() {
   const [rewards, setRewards]         = useState([])
   const [loading, setLoading]         = useState(true)
   const [redeemResult, setRedeemResult] = useState(null)  // modal data
-  const [usedOfferIds, setUsedOfferIds] = useState(new Set())
 
   useEffect(() => {
-    Promise.all([api.get('/me'), api.get('/offers')])
-      .then(([meRes, ofRes]) => {
-        const pts = {
+    Promise.all([api.get('/me'), api.get('/offers'), api.get('/rewards')])
+      .then(([meRes, ofRes, rwRes]) => {
+        setPoints({
           points:        meRes.data.points        ?? [],
           total_balance: meRes.data.total_balance ?? 0,
-        }
-        setPoints(pts)
+        })
         setLoyaltyCode(meRes.data.loyalty_code ?? null)
         setOffers(ofRes.data)
-        // Filtrar recompensas por el grupo del cliente para evitar mostrar
-        // recompensas de negocios fuera de su red
-        const groupId = pts.points.find((p) => p.type === 'group')?.group_id ?? null
-        return api.get('/rewards', groupId ? { params: { group_id: groupId } } : {})
+        setRewards(rwRes.data)
       })
-      .then((rwRes) => setRewards(rwRes.data))
       .finally(() => setLoading(false))
   }, [])
 
@@ -489,7 +469,6 @@ export default function DashboardPage() {
       redeemable_type: 'offer',
       redeemable_id:   offer.id,
     })
-    setUsedOfferIds((prev) => new Set([...prev, offer.id]))
     setRedeemResult(res.data)
   }, [])
 
@@ -626,7 +605,7 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {offers.map((offer) => (
-                <OfferCard key={offer.id} offer={offer} onRedeem={handleRedeemOffer} isUsed={usedOfferIds.has(offer.id)} />
+                <OfferCard key={offer.id} offer={offer} onRedeem={handleRedeemOffer} />
               ))}
             </div>
           )}

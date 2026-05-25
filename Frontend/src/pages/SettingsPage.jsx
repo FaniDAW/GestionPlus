@@ -11,6 +11,21 @@ const ROLE_LABEL = {
   admin:             'Administrador',
 }
 
+const STATUS_CONFIG = {
+  active:    { label: 'Activo',    className: 'bg-emerald-100 text-emerald-700' },
+  trial:     { label: 'En prueba', className: 'bg-amber-100  text-amber-700'   },
+  cancelled: { label: 'Cancelado', className: 'bg-red-100    text-red-700'     },
+  expired:   { label: 'Expirado',  className: 'bg-red-100    text-red-700'     },
+  pending:   { label: 'Pendiente', className: 'bg-slate-100  text-slate-600'   },
+}
+
+const CYCLE_LABEL = { monthly: 'Mensual', annual: 'Anual' }
+
+function formatDate(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 export default function SettingsPage() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -20,7 +35,19 @@ export default function SettingsPage() {
   const [deleting, setDeleting]               = useState(false)
   const [deleteError, setDeleteError]         = useState('')
 
+  const [subscription, setSubscription] = useState(null)
+  const [subLoading, setSubLoading]     = useState(false)
+
   useEffect(() => { window.scrollTo(0, 0) }, [])
+
+  useEffect(() => {
+    if (user?.role !== 'business_owner' && user?.role !== 'association_admin') return
+    setSubLoading(true)
+    api.get('/subscription/status')
+      .then((res) => setSubscription(res.data))
+      .catch(() => setSubscription(null))
+      .finally(() => setSubLoading(false))
+  }, [user?.role])
 
   const handleDelete = async () => {
     if (confirmText !== 'CONFIRMAR') return
@@ -79,6 +106,81 @@ export default function SettingsPage() {
             </div>
           </div>
         </section>
+
+        {/* Mi suscripción */}
+        {(user?.role === 'business_owner' || user?.role === 'association_admin') && (
+          <section className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <h2 className="text-sm font-extrabold text-slate-700 uppercase tracking-wide mb-4">Mi suscripción</h2>
+
+            {subLoading ? (
+              <div className="flex items-center gap-3 text-slate-400 text-sm">
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Cargando suscripción...
+              </div>
+            ) : !subscription ? (
+              <p className="text-sm text-slate-400">No hay ninguna suscripción activa.</p>
+            ) : (() => {
+              const statusKey  = subscription.is_trial ? 'trial' : (subscription.status ?? 'pending')
+              const statusConf = STATUS_CONFIG[statusKey] ?? STATUS_CONFIG.pending
+              return (
+                <div className="space-y-4">
+                  {/* Plan + estado */}
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Plan</p>
+                      <p className="font-extrabold text-slate-800 text-base">{subscription.plan_name}</p>
+                    </div>
+                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusConf.className}`}>
+                      {statusConf.label}
+                    </span>
+                  </div>
+
+                  {/* Trial notice */}
+                  {subscription.is_trial && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-3">
+                      <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-xs text-amber-700">
+                        Periodo de prueba activo — finaliza el <strong>{formatDate(subscription.trial_ends_at)}</strong>.
+                        No se realizará ningún cargo hasta entonces.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Detalles */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-1">
+                    <div>
+                      <p className="text-xs text-slate-400 mb-0.5">Ciclo</p>
+                      <p className="text-sm font-semibold text-slate-700">{CYCLE_LABEL[subscription.billing_cycle] ?? subscription.billing_cycle}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 mb-0.5">Precio</p>
+                      <p className="text-sm font-semibold text-slate-700">
+                        €{subscription.price?.toFixed(2)}
+                        <span className="text-xs text-slate-400 font-normal">
+                          /{subscription.billing_cycle === 'annual' ? 'año' : 'mes'}
+                        </span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-400 mb-0.5">
+                        {subscription.is_trial ? 'Prueba hasta' : 'Próxima facturación'}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-700">
+                        {formatDate(subscription.is_trial ? subscription.trial_ends_at : subscription.ends_at)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+          </section>
+        )}
 
         {/* Zona de peligro */}
         <section className="bg-white rounded-2xl border border-red-100 shadow-sm p-6">

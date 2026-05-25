@@ -11,8 +11,9 @@ const allPlans = [
   {
     id: 'individual',
     name: 'Individual',
-    price: '29',
-    period: '/mes',
+    monthly: 29,
+    annual: 290,
+    annualMonthly: 24,
     description: 'Para un negocio suelto',
     badge: null,
     features: ['Un negocio', 'Clientes ilimitados', 'Programa de puntos propio', 'Dashboard de actividad'],
@@ -20,8 +21,9 @@ const allPlans = [
   {
     id: 'association_s',
     name: 'Asociación S',
-    price: '149',
-    period: '/mes',
+    monthly: 149,
+    annual: 1490,
+    annualMonthly: 124,
     description: 'Hasta 20 negocios',
     badge: null,
     features: ['Hasta 20 negocios', 'Puntos compartidos entre negocios', 'Panel de la asociación', 'Ofertas de grupo'],
@@ -29,20 +31,12 @@ const allPlans = [
   {
     id: 'association_m',
     name: 'Asociación M',
-    price: '249',
-    period: '/mes',
+    monthly: 249,
+    annual: 2490,
+    annualMonthly: 207,
     description: 'Hasta 50 negocios',
     badge: 'Más popular',
     features: ['Hasta 50 negocios', 'Todo lo del plan S', 'Segmentación de clientes', 'Manager de cuenta'],
-  },
-  {
-    id: 'municipal',
-    name: 'Municipal',
-    price: '499',
-    period: '/mes',
-    description: 'Negocios ilimitados',
-    badge: null,
-    features: ['Negocios ilimitados', 'Todo lo del plan M', 'Branding personalizado', 'SLA garantizado'],
   },
 ]
 
@@ -115,6 +109,7 @@ export default function RegisterPage() {
 
   const [step, setStep]                 = useState(1)
   const [selectedPlan, setSelectedPlan] = useState(isAssociation ? 'association_s' : 'individual')
+  const [billing, setBilling]           = useState('monthly')
   const [serverError, setServerError]   = useState('')
   const [loadingCheckout, setLoadingCheckout] = useState(false)
 
@@ -186,7 +181,7 @@ export default function RegisterPage() {
         }
         await authRegister(payload)
         setLoadingCheckout(true)
-        const res = await api.post('/stripe/checkout', { plan: selectedPlan })
+        const res = await api.post('/stripe/checkout', { plan: selectedPlan, billing })
         window.location.href = res.data.checkout_url
         return
       }
@@ -212,9 +207,9 @@ export default function RegisterPage() {
   const showStepIndicator = plan === 'individual' || isAssociation
 
   return (
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-pink-50 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-pink-50 flex items-center justify-center px-3 py-8 overflow-hidden">
         <div className="absolute top-0 left-0 w-72 h-72 bg-violet-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 translate-y-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/4 translate-y-1/4 pointer-events-none" />
 
         <div className="relative w-full max-w-2xl">
           {/* Logo */}
@@ -232,7 +227,7 @@ export default function RegisterPage() {
 
           {/* ── Pantalla selectora (sin plan ni token) ── */}
           {!plan && !invitationToken ? (
-              <div className="bg-white rounded-3xl shadow-xl shadow-violet-100 border border-violet-50 p-8">
+              <div className="bg-white rounded-3xl shadow-xl shadow-violet-100 border border-violet-50 p-5 sm:p-8">
                 <h2 className="text-lg font-extrabold text-slate-800 text-center mb-1">¿Cómo quieres usar Gestion+?</h2>
                 <p className="text-sm text-slate-500 text-center mb-8">Selecciona el tipo de cuenta que mejor se adapta a ti</p>
                 <div className="grid sm:grid-cols-2 gap-4">
@@ -318,7 +313,7 @@ export default function RegisterPage() {
                   ))}
                 </div>
 
-                <div className="bg-white rounded-3xl shadow-xl shadow-violet-100 border border-violet-50 p-8">
+                <div className="bg-white rounded-3xl shadow-xl shadow-violet-100 border border-violet-50 p-5 sm:p-8">
                   {serverError && (
                       <div className="mb-5 flex items-center gap-3 bg-red-50 text-red-700 border border-red-100 rounded-2xl px-4 py-3 text-sm">
                         <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -511,7 +506,36 @@ export default function RegisterPage() {
                               </div>
                           )}
 
-                          <div className="grid grid-cols-2 gap-4 mb-8">
+                          {/* Billing toggle */}
+                          <div className="flex items-center justify-center gap-3 mb-6">
+                            <button
+                                type="button"
+                                onClick={() => setBilling('monthly')}
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                                    billing === 'monthly'
+                                        ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
+                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                }`}
+                            >
+                              Mensual
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setBilling('annual')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                                    billing === 'annual'
+                                        ? 'bg-violet-600 text-white shadow-md shadow-violet-200'
+                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                }`}
+                            >
+                              Anual
+                              <span className={`text-xs font-bold px-1.5 py-0.5 rounded-md ${
+                                  billing === 'annual' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'
+                              }`}>-17%</span>
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                             {visiblePlans.map((p) => (
                                 <button
                                     key={p.id}
@@ -542,10 +566,17 @@ export default function RegisterPage() {
                                     </div>
                                   </div>
 
-                                  <div className="mb-2">
-                                    <span className="text-2xl font-black text-slate-800">€{p.price}</span>
-                                    <span className="text-xs text-slate-400">{p.period}</span>
+                                  <div className="mb-1">
+                                    <span className="text-2xl font-black text-slate-800">
+                                      €{billing === 'annual' ? p.annualMonthly : p.monthly}
+                                    </span>
+                                    <span className="text-xs text-slate-400">/mes</span>
                                   </div>
+                                  {billing === 'annual' && (
+                                      <p className="text-xs text-emerald-600 font-semibold mb-2">
+                                        €{p.annual}/año · 2 meses gratis
+                                      </p>
+                                  )}
 
                                   <p className="text-xs text-slate-500 mb-3">{p.description}</p>
 

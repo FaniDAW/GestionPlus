@@ -33,10 +33,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-pink-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-white to-pink-50 flex items-center justify-center px-3 py-8 overflow-hidden">
       {/* Background blobs */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-violet-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/4 translate-y-1/4 pointer-events-none" />
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
@@ -48,7 +48,7 @@ export default function LoginPage() {
           <p className="text-slate-500 mt-1 text-sm">Inicia sesión en tu cuenta</p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl shadow-violet-100 border border-violet-50 p-8">
+        <div className="bg-white rounded-3xl shadow-xl shadow-violet-100 border border-violet-50 p-6 sm:p-8">
           {serverError && (
             <div className="mb-5 flex items-center gap-3 bg-red-50 text-red-700 border border-red-100 rounded-2xl px-4 py-3 text-sm">
               <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">

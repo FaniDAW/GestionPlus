@@ -266,7 +266,7 @@ function InviteSection({ group, onTokenGenerated }) {
           </div>
         </div>
 
-        <form onSubmit={handleEmailInvite} className="flex gap-2">
+        <form onSubmit={handleEmailInvite} className="flex flex-col sm:flex-row gap-2">
           <input
             type="email"
             value={email}
@@ -278,7 +278,7 @@ function InviteSection({ group, onTokenGenerated }) {
           <button
             type="submit"
             disabled={sending || !email.trim()}
-            className="shrink-0 flex items-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm hover:shadow-lg hover:shadow-emerald-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2.5 rounded-xl text-sm hover:shadow-lg hover:shadow-emerald-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {sending ? (
               <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

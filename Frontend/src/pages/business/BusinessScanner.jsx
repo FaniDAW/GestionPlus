@@ -174,7 +174,7 @@ function FindCustomerSection({ onFound }) {
       </h3>
       <p className="text-xs text-slate-400 mb-4">Introduce el código de fidelización de 6 dígitos o el email del cliente.</p>
 
-      <form onSubmit={handleSearch} className="flex gap-3">
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
         <input
           value={query}
           onChange={(e) => { setQuery(e.target.value); setError('') }}
@@ -184,7 +184,7 @@ function FindCustomerSection({ onFound }) {
         <button
           type="submit"
           disabled={loading || !query.trim()}
-          className="px-5 py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-md hover:shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          className="w-full sm:w-auto px-5 py-3 bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-md hover:shadow-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
