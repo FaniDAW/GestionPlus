@@ -85,6 +85,22 @@ class User extends Authenticatable
         return $this->belongsTo(Group::class);
     }
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::retrieved(function (User $user) {
+            if (is_null($user->loyalty_code)) {
+                do {
+                    $code = str_pad(random_int(0, 999_999), 6, '0', STR_PAD_LEFT);
+                } while (static::where('loyalty_code', $code)->exists());
+
+                $user->loyalty_code = $code;
+                $user->saveQuietly();
+            }
+        });
+    }
+
     // --- Helpers de rol ---
     public function isAdmin(): bool
     {

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('business_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('business_id')->nullable()->constrained()->nullOnDelete();
             $table->string('plan_name');
             $table->decimal('price', 10, 2);
             $table->enum('billing_cycle', ['monthly', 'annual'])->default('monthly');

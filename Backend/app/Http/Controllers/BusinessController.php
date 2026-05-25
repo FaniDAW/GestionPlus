@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\GroupPoint;
+use App\Models\Reward;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -42,6 +43,62 @@ class BusinessController extends Controller
         }
 
         return response()->json(array_merge($business->toArray(), ['stats' => $stats]));
+    }
+
+    public function stats(Request $request): JsonResponse
+    {
+        $business = $request->user()->businesses()->first();
+
+        if (! $business) {
+            return response()->json(['message' => 'No tienes un negocio registrado.'], 404);
+        }
+
+        $thisMonth    = now()->startOfMonth();
+        $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
+
+        $thisMonthPoints = $business->transactions()
+            ->where('type', 'earn')
+            ->where('created_at', '>=', $thisMonth)
+            ->sum('points');
+
+        $thisMonthRedemptions = $business->transactions()
+            ->where('type', 'redeem')
+            ->where('status', 'validated')
+            ->where('created_at', '>=', $thisMonth)
+            ->count();
+
+        $monthlyPoints = $business->transactions()
+            ->where('type', 'earn')
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(points) as total_points")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        $topRewards = $business->transactions()
+            ->where('type', 'redeem')
+            ->where('redeemable_type', 'reward')
+            ->where('status', 'validated')
+            ->selectRaw('redeemable_id, COUNT(*) as count')
+            ->groupBy('redeemable_id')
+            ->orderByDesc('count')
+            ->limit(3)
+            ->get()
+            ->map(function ($item) {
+                $reward = Reward::find($item->redeemable_id);
+
+                return [
+                    'name'  => $reward?->name ?? 'Recompensa eliminada',
+                    'count' => (int) $item->count,
+                ];
+            });
+
+        return response()->json([
+            'this_month_points'      => (int) $thisMonthPoints,
+            'this_month_redemptions' => (int) $thisMonthRedemptions,
+            'monthly_points'         => $monthlyPoints,
+            'top_rewards'            => $topRewards,
+        ]);
     }
 
     public function store(Request $request): JsonResponse

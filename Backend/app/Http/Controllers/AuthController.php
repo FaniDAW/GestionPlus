@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\GroupInvitation;
 use App\Models\GroupPoint;
 use App\Models\Point;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,6 +86,7 @@ class AuthController extends Controller
         $businessName = ! empty($data['business_name']) ? $data['business_name'] : $data['name'];
 
         if ($group) {
+            // Flow: invitation token — business owner joining an existing group
             $business = Business::create([
                 'name'      => $businessName,
                 'email'     => $data['email'],
@@ -94,14 +96,54 @@ class AuthController extends Controller
 
             $group->businesses()->attach($business->id);
 
-            // Consume the email-based invitation if it was used
             GroupInvitation::where('token', $data['invitation_token'] ?? '')->delete();
+
         } elseif (($data['plan'] ?? null) === 'individual') {
-            Business::create([
+            // Flow: individual business plan — create business + pending subscription
+            $business = Business::create([
                 'name'      => $businessName,
                 'email'     => $data['email'],
                 'owner_id'  => $user->id,
                 'is_active' => false,
+            ]);
+
+            Subscription::create([
+                'business_id'   => $business->id,
+                'plan_name'     => 'Individual',
+                'price'         => 29.00,
+                'billing_cycle' => 'monthly',
+                'status'        => 'pending',
+                'starts_at'     => now()->toDateString(),
+                'ends_at'       => now()->addDays(14)->toDateString(),
+            ]);
+
+        } elseif (in_array($data['plan'] ?? null, ['association_s', 'association_m', 'municipal'])) {
+            // Flow: association / municipal plan — create group, link admin, pending subscription
+            $planMap = [
+                'association_s' => ['label' => 'Asociación S', 'price' => 149.00, 'max' => 20,   'type' => 'association'],
+                'association_m' => ['label' => 'Asociación M', 'price' => 249.00, 'max' => 50,   'type' => 'association'],
+                'municipal'     => ['label' => 'Municipal',    'price' => 499.00, 'max' => null,  'type' => 'municipal'],
+            ];
+            $cfg = $planMap[$data['plan']];
+
+            $newGroup = Group::create([
+                'name'           => $businessName,
+                'type'           => $cfg['type'],
+                'contact_email'  => $data['email'],
+                'max_businesses' => $cfg['max'],
+                'is_active'      => true,
+            ]);
+
+            $user->update(['group_id' => $newGroup->id]);
+
+            Subscription::create([
+                'group_id'      => $newGroup->id,
+                'plan_name'     => $cfg['label'],
+                'price'         => $cfg['price'],
+                'billing_cycle' => 'monthly',
+                'status'        => 'pending',
+                'starts_at'     => now()->toDateString(),
+                'ends_at'       => now()->addDays(14)->toDateString(),
             ]);
         }
 

@@ -44,6 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Canje de recompensas y ofertas (cliente)
     Route::post('/transactions/redeem', [TransactionController::class, 'redeem']);
+
+    // Estado de la suscripción del usuario autenticado
+    Route::get('/subscription/status', [SubscriptionController::class, 'status']);
 });
 
 // Solo admin
@@ -74,6 +77,7 @@ Route::middleware(['auth:sanctum', 'role:association_admin'])->group(function ()
 // Solo business_owner
 Route::middleware(['auth:sanctum', 'role:business_owner'])->group(function () {
     Route::get('/my-business',                              [BusinessController::class, 'myBusiness']);
+    Route::get('/my-business/stats',                        [BusinessController::class, 'stats']);
     Route::get('/qr/scan/{code}',                           [QrController::class, 'scan']);
     Route::post('/scanner/find-customer',                   [QrController::class, 'findCustomer']);
     Route::post('/transactions/validate-code',              [TransactionController::class, 'validateCode']);
