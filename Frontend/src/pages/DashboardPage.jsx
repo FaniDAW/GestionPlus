@@ -63,7 +63,7 @@ function RedeemModal({ result, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-7 flex flex-col items-center gap-5">
 
-        {/* Header */}
+        {/* Encabezado */}
         <div className="text-center">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-md mx-auto mb-3 ${
             isReward ? 'bg-gradient-to-br from-violet-500 to-pink-500 shadow-violet-200'
@@ -367,7 +367,7 @@ function QrSection({ loyaltyCode }) {
   )
 }
 
-function RewardCard({ reward, balance, onRedeem }) {
+function RewardCard({ reward, balance, onRedeem, isRedeemed }) {
   const canAfford = balance >= reward.points_required
   const [busy, setBusy] = useState(false)
 
@@ -380,27 +380,38 @@ function RewardCard({ reward, balance, onRedeem }) {
     }
   }
 
+  const dimmed = isRedeemed || !canAfford
+
   return (
-    <div className={`bg-white rounded-2xl border shadow-sm p-5 flex flex-col gap-3 transition-all ${
-      canAfford
-        ? 'border-violet-100 hover:shadow-md hover:border-violet-200'
-        : 'border-slate-100 opacity-60'
+    <div className={`relative bg-white rounded-2xl border shadow-sm p-5 flex flex-col gap-3 transition-all ${
+      isRedeemed
+        ? 'border-slate-100 opacity-50'
+        : canAfford
+          ? 'border-violet-100 hover:shadow-md hover:border-violet-200'
+          : 'border-slate-100 opacity-60'
     }`}>
+      {isRedeemed && (
+        <span className="absolute top-3 right-3 inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-pink-100 text-pink-600">
+          Canjeada
+        </span>
+      )}
       <div className="flex items-start justify-between gap-3">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
-          canAfford ? 'bg-gradient-to-br from-violet-500 to-pink-500 shadow-violet-100'
-                    : 'bg-slate-200'
+          !dimmed ? 'bg-gradient-to-br from-violet-500 to-pink-500 shadow-violet-100'
+                  : 'bg-slate-200'
         }`}>
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
           </svg>
         </div>
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${
-          canAfford ? 'bg-violet-50 text-violet-600' : 'bg-slate-100 text-slate-400'
-        }`}>
-          {reward.points_required} pts
-        </span>
+        {!isRedeemed && (
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold shrink-0 ${
+            canAfford ? 'bg-violet-50 text-violet-600' : 'bg-slate-100 text-slate-400'
+          }`}>
+            {reward.points_required} pts
+          </span>
+        )}
       </div>
       <div className="flex-1">
         <p className="font-bold text-slate-800 leading-snug">{reward.name}</p>
@@ -416,10 +427,10 @@ function RewardCard({ reward, balance, onRedeem }) {
       </div>
       <button
         onClick={handleClaim}
-        disabled={!canAfford || busy}
+        disabled={!canAfford || busy || isRedeemed}
         className="w-full py-2 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-bold hover:shadow-md hover:shadow-violet-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        {busy ? 'Canjeando...' : canAfford ? 'Canjear' : 'Puntos insuficientes'}
+        {busy ? 'Canjeando...' : isRedeemed ? 'Canjeada' : canAfford ? 'Canjear' : 'Puntos insuficientes'}
       </button>
     </div>
   )
@@ -432,12 +443,17 @@ export default function DashboardPage() {
   const [loyaltyCode, setLoyaltyCode] = useState(null)
   const [offers, setOffers]           = useState([])
   const [rewards, setRewards]         = useState([])
+  const [redeemedIds, setRedeemedIds] = useState(new Set())
   const [loading, setLoading]         = useState(true)
-  const [redeemResult, setRedeemResult] = useState(null)  // modal data
+  const [redeemResult, setRedeemResult] = useState(null)  // datos del modal
 
   useEffect(() => {
-    Promise.all([api.get('/me'), api.get('/offers'), api.get('/rewards')])
-      .then(([meRes, ofRes, rwRes]) => {
+    Promise.all([
+      api.get('/me'),
+      api.get('/offers'),
+      api.get('/rewards'),
+      api.get('/my-redeemed-rewards'),
+    ]).then(([meRes, ofRes, rwRes, redeemedRes]) => {
         setPoints({
           points:        meRes.data.points        ?? [],
           total_balance: meRes.data.total_balance ?? 0,
@@ -445,6 +461,7 @@ export default function DashboardPage() {
         setLoyaltyCode(meRes.data.loyalty_code ?? null)
         setOffers(ofRes.data)
         setRewards(rwRes.data)
+        setRedeemedIds(new Set(redeemedRes.data))
       })
       .finally(() => setLoading(false))
   }, [])
@@ -482,7 +499,7 @@ export default function DashboardPage() {
       {redeemResult && (
         <RedeemModal result={redeemResult} onClose={() => setRedeemResult(null)} />
       )}
-      {/* Top bar */}
+      {/* Barra superior */}
       <header className="bg-white border-b border-pink-100 shadow-sm shadow-pink-50/50 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -635,6 +652,7 @@ export default function DashboardPage() {
                   reward={reward}
                   balance={points?.total_balance ?? 0}
                   onRedeem={handleRedeemReward}
+                  isRedeemed={redeemedIds.has(reward.id)}
                 />
               ))}
             </div>
