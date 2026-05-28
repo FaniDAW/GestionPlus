@@ -6,14 +6,15 @@ export default function CTASection() {
     <section className="py-24 bg-white">
       <div className="max-w-4xl mx-auto px-6">
         <AnimateOnScroll from="zoom" className="relative bg-linear-to-br from-violet-600 to-pink-500 rounded-3xl p-12 text-center overflow-hidden">
-          {/* Decorative circles */}
-          <div className="absolute top-0 left-0 w-48 h-48 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2" />
-          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full" />
+          {/* Decorative favicons */}
+          <img src="/favicon.svg" className="absolute -top-8 -left-8 w-48 h-48 opacity-10 rotate-45 pointer-events-none select-none" />
+          <img src="/favicon.svg" className="absolute top-1/2 right-8 w-24 h-24 opacity-10 -translate-y-1/2 -rotate-12 pointer-events-none select-none" />
+          <img src="/favicon.svg" className="absolute bottom-0 right-0 w-56 h-56 opacity-15 translate-x-1/2 translate-y-1/2 pointer-events-none select-none" />
+          <img src="/favicon.svg" className="absolute top-1/2 left-1/4 w-20 h-20 opacity-10 -translate-y-1/2 pointer-events-none select-none" />
 
           <div className="relative z-10">
             <span className="inline-block bg-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-              Te ayyudamos a mejorar tu empresa
+              Te ayudamos a mejorar tu empresa
             </span>
 
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">

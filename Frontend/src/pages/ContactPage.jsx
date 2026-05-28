@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [sent, setSent] = useState(false)
+
+  useEffect(() => { window.scrollTo(0, 0) }, [])
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
@@ -41,6 +44,7 @@ export default function ContactPage() {
       </section>
 
       {/* Content */}
+      <AnimateOnScroll from="bottom">
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -220,6 +224,7 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

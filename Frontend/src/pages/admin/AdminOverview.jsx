@@ -59,13 +59,13 @@ export default function AdminOverview() {
 
   return (
     <div className="p-8">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-800">Dashboard</h1>
         <p className="text-slate-500 text-sm mt-1">Resumen general de la plataforma</p>
       </div>
 
-      {/* Stat cards */}
+      {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {statCards.map((card) => (
           <div

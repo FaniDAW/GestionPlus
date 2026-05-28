@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 const cases = [
   {
@@ -71,6 +73,8 @@ const logos = [
 ]
 
 export default function ClientesPage() {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -97,6 +101,7 @@ export default function ClientesPage() {
       </section>
 
       {/* Logos */}
+      <AnimateOnScroll from="bottom">
       <section className="py-12 bg-white border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <p className="text-center text-xs font-semibold text-slate-400 uppercase tracking-widest mb-8">Algunos de nuestros clientes</p>
@@ -107,8 +112,10 @@ export default function ClientesPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* Cases */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6 space-y-10">
           {cases.map((c) => (
@@ -143,8 +150,10 @@ export default function ClientesPage() {
           ))}
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* CTA */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-20 bg-gradient-to-br from-slate-50 to-violet-50">
         <div className="max-w-3xl mx-auto px-6">
           <div className="relative bg-gradient-to-br from-violet-600 to-pink-500 rounded-3xl p-12 text-center overflow-hidden">
@@ -160,6 +169,7 @@ export default function ClientesPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

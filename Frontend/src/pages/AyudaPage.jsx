@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 const categories = [
   {
@@ -142,6 +143,8 @@ export default function AyudaPage() {
   const [active, setActive] = useState('negocio')
   const current = categories.find((c) => c.id === active)
 
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -168,6 +171,7 @@ export default function AyudaPage() {
       </section>
 
       {/* Content */}
+      <AnimateOnScroll from="bottom">
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           {/* Category tabs */}
@@ -194,8 +198,10 @@ export default function AyudaPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* Still need help */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-16 bg-gradient-to-br from-slate-50 to-violet-50">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <div className="w-12 h-12 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center mx-auto mb-5">
@@ -213,6 +219,7 @@ export default function AyudaPage() {
           </Link>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

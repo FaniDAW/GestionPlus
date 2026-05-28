@@ -14,9 +14,9 @@ const routes = {
 }
 
 const otherLinks = {
-  Empresa: ['Sobre nosotros', 'Blog', 'Clientes', 'Prensa', 'Contacto'],
-  Legal: ['Privacidad', 'Términos de uso', 'Cookies', 'RGPD'],
-  Soporte: ['Centro de ayuda', 'Documentación', 'API', 'Status', 'Comunidad'],
+  Empresa: ['Sobre nosotros', 'Blog', 'Clientes', 'Contacto'],
+  Legal: ['Privacidad', 'Términos de uso', 'Cookies'],
+  Soporte: ['Centro de ayuda'],
 }
 
 export default function Footer() {

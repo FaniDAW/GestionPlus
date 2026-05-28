@@ -6,7 +6,7 @@ const steps = [
     number: '01',
     from: 'left',
     title: 'Crea tu programa',
-    description: 'Registra tu negocio en minutos. Define tus reglas de puntos, recompensas y colores de marca.',
+    description: 'Registra tu negocio en minutos. Define tus reglas de puntos, recompensas y ofertas.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
@@ -24,7 +24,7 @@ const steps = [
     number: '02',
     from: 'bottom',
     title: 'Tus clientes participan',
-    description: 'Comparten su número o escanean QR en cada compra. Acumulan puntos automáticamente, sin apps extra.',
+    description: 'Comparten su QR o númeronode -v en cada compra. Acumulan puntos automáticamente, sin apps extra.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}

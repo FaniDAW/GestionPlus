@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 const team = [
   { name: 'Carlos Romero', role: 'CEO & Cofundador', color: 'bg-violet-400', initial: 'C' },
@@ -42,6 +44,8 @@ const stats = [
 ]
 
 export default function SobreNosotrosPage() {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -68,6 +72,7 @@ export default function SobreNosotrosPage() {
       </section>
 
       {/* Stats */}
+      <AnimateOnScroll from="bottom">
       <section className="py-14 bg-white border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s) => (
@@ -78,8 +83,10 @@ export default function SobreNosotrosPage() {
           ))}
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* Misión */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
@@ -103,8 +110,10 @@ export default function SobreNosotrosPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* Valores */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-20 bg-gradient-to-br from-slate-50 to-violet-50">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -122,8 +131,10 @@ export default function SobreNosotrosPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* Equipo */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-20 bg-white">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
@@ -143,8 +154,10 @@ export default function SobreNosotrosPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* CTA */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-20 bg-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="relative bg-gradient-to-br from-violet-600 to-pink-500 rounded-3xl p-12 text-center overflow-hidden">
@@ -165,6 +178,7 @@ export default function SobreNosotrosPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

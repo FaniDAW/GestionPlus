@@ -49,7 +49,7 @@ function AddExistingModal({ group, onClose, onAdded }) {
     >
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg flex flex-col max-h-[85vh]">
 
-        {/* Header */}
+        {/* Encabezado */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
           <div>
             <h2 className="text-lg font-extrabold text-slate-800">Añadir negocio existente</h2>
@@ -65,7 +65,7 @@ function AddExistingModal({ group, onClose, onAdded }) {
           </button>
         </div>
 
-        {/* Limit bar */}
+        {/* Barra de capacidad */}
         <div className="px-6 py-4 border-b border-slate-100 shrink-0">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="font-medium text-slate-600">Capacidad del plan</span>
@@ -88,7 +88,7 @@ function AddExistingModal({ group, onClose, onAdded }) {
           )}
         </div>
 
-        {/* Search */}
+        {/* Búsqueda */}
         <div className="px-6 py-3 border-b border-slate-100 shrink-0">
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,7 +105,7 @@ function AddExistingModal({ group, onClose, onAdded }) {
           </div>
         </div>
 
-        {/* List */}
+        {/* Lista */}
         <div className="flex-1 overflow-y-auto px-6 py-3 space-y-2 min-h-0">
           {loadingAvail ? (
             Array.from({ length: 4 }).map((_, i) => (
@@ -155,7 +155,7 @@ function AddExistingModal({ group, onClose, onAdded }) {
           )}
         </div>
 
-        {/* Footer */}
+        {/* Pie */}
         <div className="px-6 pt-4 pb-6 border-t border-slate-100 shrink-0">
           {error && <p className="text-xs text-red-500 font-medium text-center mb-3">{error}</p>}
           <div className="flex gap-3">
@@ -202,7 +202,7 @@ function InviteSection({ group, onTokenGenerated }) {
   const [generating, setGenerating] = useState(false)
   const [copied, setCopied]         = useState(false)
 
-  // Email invite state
+  // Estado del formulario de invitación por email
   const [email, setEmail]       = useState('')
   const [sending, setSending]   = useState(false)
   const [sent, setSent]         = useState(false)
@@ -316,7 +316,7 @@ function InviteSection({ group, onTokenGenerated }) {
         )}
       </div>
 
-      {/* ── Divider ── */}
+      {/* ── Separador ── */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-slate-100" />
         <span className="text-xs text-slate-400 font-medium">o comparte el enlace</span>
@@ -463,7 +463,7 @@ export default function AssociationBusinesses() {
         onCancel={() => setDeleteBiz(null)}
       />
 
-      {/* Page header */}
+      {/* Encabezado de página */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800">Negocios asociados</h1>
@@ -602,7 +602,7 @@ export default function AssociationBusinesses() {
           </tbody>
         </table>
 
-        {/* Mobile cards */}
+        {/* Tarjetas móvil */}
         <div className="md:hidden divide-y divide-slate-100">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (

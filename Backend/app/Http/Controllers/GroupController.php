@@ -93,7 +93,7 @@ class GroupController extends Controller
             return response()->json(['message' => 'No tienes un grupo asignado.'], 404);
         }
 
-        // Only businesses not yet in any group
+        // Solo negocios que todavía no pertenecen a ningún grupo
         $businesses = Business::with('owner')
             ->whereDoesntHave('groups')
             ->orderBy('name')
@@ -118,13 +118,13 @@ class GroupController extends Controller
 
     public function resolveInvitation(string $token): JsonResponse
     {
-        // Link-based invitation (group token)
+        // Invitación por enlace (token de grupo)
         $group = Group::where('invitation_token', $token)->first();
         if ($group) {
             return response()->json(['group_name' => $group->name, 'group_type' => $group->type]);
         }
 
-        // Email-based invitation (per-email token)
+        // Invitación por email (token por dirección de correo)
         $invitation = GroupInvitation::with('group')
             ->where('token', $token)
             ->where('expires_at', '>', now())
@@ -152,7 +152,7 @@ class GroupController extends Controller
             'email' => 'required|email|max:255',
         ]);
 
-        // Revoke any previous pending invitation for this email in this group
+        // Revocar cualquier invitación pendiente anterior para este email en este grupo
         GroupInvitation::where('group_id', $group->id)
             ->where('email', $data['email'])
             ->delete();

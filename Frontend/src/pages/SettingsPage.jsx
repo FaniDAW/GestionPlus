@@ -55,7 +55,7 @@ export default function SettingsPage() {
     setDeleteError('')
     try {
       await api.delete('/user')
-      // Clear local auth state and redirect home
+      // Limpiar el estado de autenticación local y redirigir al inicio
       localStorage.removeItem('token')
       await logout()
       navigate('/', { replace: true })
@@ -69,7 +69,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Topbar */}
+      {/* Barra de navegación superior */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center gap-4">
           <Link
@@ -138,7 +138,7 @@ export default function SettingsPage() {
                     </span>
                   </div>
 
-                  {/* Trial notice */}
+                  {/* Aviso de periodo de prueba */}
                   {subscription.is_trial && (
                     <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-3">
                       <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

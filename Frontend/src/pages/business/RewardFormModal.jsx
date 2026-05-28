@@ -48,7 +48,7 @@ export default function RewardFormModal({ reward, businessId, onSave, onClose })
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-lg max-h-[90vh] flex flex-col">
-        {/* Header */}
+        {/* Encabezado */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 shrink-0">
           <h3 className="text-base font-extrabold text-slate-800">
             {reward ? 'Editar recompensa' : 'Nueva recompensa'}

@@ -71,7 +71,7 @@ function BusinessMockup() {
 
   return (
     <div ref={ref} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-4">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-100">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
@@ -181,7 +181,7 @@ const groupPlans = [
     monthlyPrice: 499,
     annualPrice: 399,
     description: 'Negocios ilimitados',
-    badge: null,
+    badge: 'Próximamente',
     highlight: false,
     features: [
       'Negocios ilimitados',
@@ -204,7 +204,11 @@ function PlanCard({ plan, annual, onCta, loading }) {
         : 'border-slate-200 bg-white'
     }`}>
       {plan.badge && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs font-bold px-5 py-1.5 rounded-full whitespace-nowrap">
+        <div className={`absolute -top-4 left-1/2 -translate-x-1/2 text-xs font-bold px-5 py-1.5 rounded-full whitespace-nowrap ${
+          plan.badge === 'Próximamente'
+            ? 'bg-slate-700 text-slate-100'
+            : 'bg-gradient-to-r from-violet-500 to-pink-500 text-white'
+        }`}>
           {plan.badge}
         </div>
       )}
@@ -254,7 +258,7 @@ export default function Pricing() {
   const navigate  = useNavigate()
 
   const handleCta = async (plan) => {
-    if (!plan.id) { navigate('/contact'); return }
+    if (!plan.id) { navigate('/contacto'); return }
     if (!user) {
       navigate(plan.id === 'individual' ? '/register?plan=individual' : '/register')
       return
@@ -273,7 +277,7 @@ export default function Pricing() {
     <section id="precios" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* Header */}
+        {/* Encabezado */}
         <AnimateOnScroll from="bottom" className="text-center mb-12">
           <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
             Precios
@@ -351,7 +355,7 @@ export default function Pricing() {
                 plan={plan}
                 annual={annual}
                 onCta={handleCta}
-                loading={loadingPlan === plan.id}
+                loading={plan.id !== null && loadingPlan === plan.id}
               />
             ))}
           </AnimateOnScroll>

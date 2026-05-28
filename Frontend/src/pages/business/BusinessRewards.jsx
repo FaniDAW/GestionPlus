@@ -12,7 +12,7 @@ export default function BusinessRewards() {
   const [rewards, setRewards]       = useState([])
   const [business, setBusiness]     = useState(null)
   const [loading, setLoading]       = useState(true)
-  const [formReward, setFormReward] = useState(undefined) // undefined = closed, null = create, object = edit
+  const [formReward, setFormReward] = useState(undefined) // undefined = cerrado, null = crear, objeto = editar
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [toggling, setToggling]     = useState(null)
 
@@ -54,7 +54,7 @@ export default function BusinessRewards() {
 
   return (
     <div className="p-4 md:p-8">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800">Recompensas</h1>
@@ -189,7 +189,7 @@ export default function BusinessRewards() {
         </table>
       </div>
 
-      {/* Mobile cards */}
+      {/* Tarjetas móvil */}
       <div className="md:hidden space-y-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (

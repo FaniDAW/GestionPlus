@@ -58,7 +58,7 @@ const navItems = [
 function SidebarContent({ user, onLogout, onClose }) {
   return (
     <>
-      {/* Logo + close button (mobile) */}
+      {/* Logo + botón de cerrar (móvil) */}
       <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div>
@@ -77,7 +77,7 @@ function SidebarContent({ user, onLogout, onClose }) {
         </button>
       </div>
 
-      {/* Nav */}
+      {/* Navegación */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map((item) => (
           <NavLink
@@ -98,7 +98,7 @@ function SidebarContent({ user, onLogout, onClose }) {
         ))}
       </nav>
 
-      {/* User + logout */}
+      {/* Usuario + cerrar sesión */}
       <div className="px-4 py-4 border-t border-slate-100">
         <div className="flex items-center gap-3 mb-2 px-2">
           <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center shrink-0">

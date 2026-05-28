@@ -45,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Canje de recompensas y ofertas (cliente)
     Route::post('/transactions/redeem', [TransactionController::class, 'redeem']);
 
+    // IDs de recompensas ya canjeadas por el cliente autenticado
+    Route::get('/my-redeemed-rewards', [TransactionController::class, 'myRedeemedRewards']);
+
     // Estado de la suscripción del usuario autenticado
     Route::get('/subscription/status', [SubscriptionController::class, 'status']);
 });

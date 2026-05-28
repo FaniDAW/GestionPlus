@@ -36,7 +36,7 @@ class AuthController extends Controller
         $role  = 'customer';
 
         if (! empty($data['invitation_token'])) {
-            // Try link-based token first, then email-based token
+            // Primero el token del enlace, luego el token por email
             $group = Group::where('invitation_token', $data['invitation_token'])->first();
 
             if (! $group) {
@@ -86,7 +86,7 @@ class AuthController extends Controller
         $businessName = ! empty($data['business_name']) ? $data['business_name'] : $data['name'];
 
         if ($group) {
-            // Flow: invitation token — business owner joining an existing group
+            // Flujo: token de invitación — propietario de negocio uniéndose a un grupo existente
             $business = Business::create([
                 'name'      => $businessName,
                 'email'     => $data['email'],
@@ -99,7 +99,7 @@ class AuthController extends Controller
             GroupInvitation::where('token', $data['invitation_token'] ?? '')->delete();
 
         } elseif (($data['plan'] ?? null) === 'individual') {
-            // Flow: individual business plan — create business + pending subscription
+            // Flujo: plan individual — crear negocio + suscripción pendiente
             $business = Business::create([
                 'name'      => $businessName,
                 'email'     => $data['email'],
@@ -118,7 +118,7 @@ class AuthController extends Controller
             ]);
 
         } elseif (in_array($data['plan'] ?? null, ['association_s', 'association_m', 'municipal'])) {
-            // Flow: association / municipal plan — create group, link admin, pending subscription
+            // Flujo: plan de asociación / municipal — crear grupo, vincular admin, suscripción pendiente
             $planMap = [
                 'association_s' => ['label' => 'Asociación S', 'price' => 149.00, 'max' => 20,   'type' => 'association'],
                 'association_m' => ['label' => 'Asociación M', 'price' => 249.00, 'max' => 50,   'type' => 'association'],

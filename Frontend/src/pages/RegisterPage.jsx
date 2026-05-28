@@ -164,7 +164,7 @@ export default function RegisterPage() {
         password_confirmation: data.password_confirmation,
       }
 
-      // Flow 1: invitation token
+      // Flujo 1: token de invitación
       if (invitationToken) {
         payload.invitation_token = invitationToken
         payload.business_name    = data.business_name
@@ -173,7 +173,7 @@ export default function RegisterPage() {
         return
       }
 
-      // Flow 2: business or association plan → Stripe checkout
+      // Flujo 2: plan de negocio o asociación → checkout de Stripe
       if (plan === 'individual' || isAssociation) {
         payload.plan = selectedPlan
         if (selectedPlan === 'individual') {
@@ -186,7 +186,7 @@ export default function RegisterPage() {
         return
       }
 
-      // Flow 3: customer (no params)
+      // Flujo 3: cliente (sin parámetros)
       const userData = await authRegister(payload)
       navigate(getDashboardPath(userData.user.role))
     } catch (err) {
@@ -290,7 +290,7 @@ export default function RegisterPage() {
                     </div>
                 )}
 
-                {/* Step indicator */}
+                {/* Indicador de paso */}
                 <div className={`flex items-center justify-center gap-3 mb-8 ${showStepIndicator ? '' : 'hidden'}`}>
                   {[1, 2].map((s) => (
                       <div key={s} className="flex items-center gap-3">
@@ -506,7 +506,7 @@ export default function RegisterPage() {
                               </div>
                           )}
 
-                          {/* Billing toggle */}
+                          {/* Selector de ciclo de facturación */}
                           <div className="flex items-center justify-center gap-3 mb-6">
                             <button
                                 type="button"

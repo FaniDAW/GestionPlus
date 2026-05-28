@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 const sections = [
   {
@@ -82,6 +84,8 @@ Para ejercer estos derechos, escríbenos a privacidad@gestionplus.com. También 
 ]
 
 export default function PrivacidadPage() {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -99,6 +103,7 @@ export default function PrivacidadPage() {
       </section>
 
       {/* Content */}
+      <AnimateOnScroll from="bottom">
       <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="bg-violet-50 border border-violet-100 rounded-2xl p-6 mb-10">
@@ -117,6 +122,7 @@ export default function PrivacidadPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

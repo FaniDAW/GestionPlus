@@ -5,7 +5,7 @@ export default function AssociationSection() {
     <section className="py-24 bg-gradient-to-br from-slate-50 via-white to-violet-50/30 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
 
-        {/* Header */}
+        {/* Encabezado */}
         <AnimateOnScroll from="bottom" className="text-center mb-16">
           <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-4">
             Para asociaciones y ayuntamientos

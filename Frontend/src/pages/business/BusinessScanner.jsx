@@ -21,7 +21,7 @@ function CustomerAvatar({ name }) {
 function ValidateCodeSection() {
   const [code, setCode]         = useState('')
   const [loading, setLoading]   = useState(false)
-  const [result, setResult]     = useState(null)   // { type, customer, meta, points_redeemed }
+  const [result, setResult]     = useState(null)   // { type, customer, meta, points_redeemed } — forma del resultado
   const [error, setError]       = useState('')
 
   const handleValidate = async (e) => {
@@ -318,13 +318,13 @@ export default function BusinessScanner() {
 
   return (
     <div className="p-8 max-w-2xl mx-auto">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-slate-800">Escanear cliente</h1>
         <p className="text-slate-400 text-sm mt-1">Lee el QR del cliente para gestionar sus puntos y recompensas.</p>
       </div>
 
-      {/* Feedback messages */}
+      {/* Mensajes de respuesta */}
       {successMsg && (
         <div className="mb-6 flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl px-5 py-3.5 text-sm font-medium">
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,7 +360,7 @@ export default function BusinessScanner() {
         </div>
       )}
 
-      {/* ── IDLE: prompt to start ── */}
+      {/* ── INACTIVO: invitar al usuario a comenzar ── */}
       {phase === 'idle' && (
         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-12 text-center">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-100 to-pink-100 flex items-center justify-center mx-auto mb-6">
@@ -387,7 +387,7 @@ export default function BusinessScanner() {
         </div>
       )}
 
-      {/* ── SCANNING ── */}
+      {/* ── ESCANEANDO ── */}
       {phase === 'scanning' && (
         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-5">
           <div className="flex items-center justify-between">
@@ -406,7 +406,7 @@ export default function BusinessScanner() {
         </div>
       )}
 
-      {/* ── LOADING ── */}
+      {/* ── CARGANDO ── */}
       {phase === 'loading' && (
         <div className="bg-white rounded-3xl border border-slate-100 shadow-sm">
           <Spinner />
@@ -427,10 +427,10 @@ export default function BusinessScanner() {
         </div>
       )}
 
-      {/* ── FOUND: customer info + actions ── */}
+      {/* ── ENCONTRADO: info del cliente + acciones ── */}
       {phase === 'found' && customer && (
         <div className="space-y-5">
-          {/* Customer card */}
+          {/* Tarjeta del cliente */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-4">
@@ -446,7 +446,7 @@ export default function BusinessScanner() {
               </div>
             </div>
 
-            {/* Scan again */}
+            {/* Escanear de nuevo */}
             <button
               onClick={reset}
               className="w-full flex items-center justify-center gap-2 border border-slate-200 text-slate-500 text-sm font-medium py-2.5 rounded-xl hover:border-violet-300 hover:text-violet-600 transition-all"
@@ -459,7 +459,7 @@ export default function BusinessScanner() {
             </button>
           </div>
 
-          {/* Assign points */}
+          {/* Asignar puntos */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
             <h3 className="font-extrabold text-slate-800 mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -469,7 +469,7 @@ export default function BusinessScanner() {
               Asignar puntos
             </h3>
 
-            {/* Quick-add buttons */}
+            {/* Botones de añadir rápido */}
             <div className="flex gap-2 mb-4">
               {[10, 25, 50, 100].map((n) => (
                 <button
@@ -510,7 +510,7 @@ export default function BusinessScanner() {
             </div>
           </div>
 
-          {/* Rewards */}
+          {/* Recompensas */}
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
             <h3 className="font-extrabold text-slate-800 mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

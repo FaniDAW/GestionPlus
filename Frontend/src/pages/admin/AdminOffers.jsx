@@ -195,7 +195,7 @@ export default function AdminOffers() {
         </table>
       </div>
 
-      {/* Mobile cards */}
+      {/* Tarjetas móvil */}
       <div className="md:hidden space-y-3">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (

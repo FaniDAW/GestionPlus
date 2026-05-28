@@ -178,7 +178,7 @@ export default function BusinessOffers() {
         </table>
       </div>
 
-      {/* Mobile cards */}
+      {/* Tarjetas móvil */}
       <div className="md:hidden space-y-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
@@ -264,7 +264,7 @@ export default function BusinessOffers() {
             </span>
           </div>
 
-          {/* Desktop table */}
+          {/* Tabla escritorio */}
           <div className="hidden md:block bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead>
@@ -321,7 +321,7 @@ export default function BusinessOffers() {
             </table>
           </div>
 
-          {/* Mobile cards */}
+          {/* Tarjetas móvil */}
           <div className="md:hidden space-y-3">
             {loading ? (
               Array.from({ length: 2 }).map((_, i) => (

@@ -63,7 +63,7 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        // Cancel active subscription if exists
+        // Cancelar la suscripción activa si existe
         $subscription = $this->findActiveSubscription($user);
         if ($subscription) {
             if ($subscription->stripe_subscription_id) {
@@ -77,7 +77,7 @@ class UserController extends Controller
             $subscription->update(['status' => 'cancelled']);
         }
 
-        // Revoke all tokens before deleting
+        // Revocar todos los tokens antes de eliminar
         $user->tokens()->delete();
 
         $user->delete();
@@ -87,7 +87,7 @@ class UserController extends Controller
 
     private function findActiveSubscription(User $user): ?Subscription
     {
-        // business_owner → subscription via their business
+        // business_owner → suscripción a través de su negocio
         if ($user->role === 'business_owner') {
             $business = $user->businesses()->first();
             if ($business) {
@@ -98,7 +98,7 @@ class UserController extends Controller
             }
         }
 
-        // association_admin → subscription via their group
+        // association_admin → suscripción a través de su grupo
         if ($user->role === 'association_admin' && $user->group_id) {
             return Subscription::where('group_id', $user->group_id)
                 ->whereIn('status', ['active', 'trialing'])

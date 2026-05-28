@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 const articles = [
   {
@@ -72,6 +73,8 @@ export default function BlogPage() {
   const [active, setActive] = useState('Todos')
   const filtered = active === 'Todos' ? articles : articles.filter((a) => a.category === active)
 
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -98,9 +101,10 @@ export default function BlogPage() {
       </section>
 
       {/* Content */}
+      <AnimateOnScroll from="bottom">
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
-          {/* Filter */}
+          {/* Filtro */}
           <div className="flex flex-wrap gap-2 mb-10">
             {categories.map((cat) => (
               <button
@@ -140,8 +144,10 @@ export default function BlogPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       {/* Newsletter */}
+      <AnimateOnScroll from="bottom" delay={0.05}>
       <section className="py-16 bg-gradient-to-br from-slate-50 to-violet-50">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="text-2xl font-extrabold text-slate-800 mb-3">Recibe los mejores artículos</h2>
@@ -161,6 +167,7 @@ export default function BlogPage() {
           </form>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

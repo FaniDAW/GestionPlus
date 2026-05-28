@@ -172,7 +172,7 @@ export default function AssociationOffers() {
         </table>
       </div>
 
-      {/* Mobile cards */}
+      {/* Tarjetas móvil */}
       <div className="md:hidden space-y-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (

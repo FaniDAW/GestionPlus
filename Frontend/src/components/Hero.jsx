@@ -1,17 +1,18 @@
 import Button from './ui/Button'
 import AnimateOnScroll from './AnimateOnScroll'
+import dashboardImg from '../assets/dashboard_cliente.png'
 
 export default function Hero() {
   return (
     <section className="relative pt-32 pb-20 overflow-hidden bg-linear-to-br from-violet-50 via-white to-pink-50">
-      {/* Background blobs */}
+      {/* Manchas de fondo */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-violet-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute top-0 right-0 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-sky-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 translate-y-1/2" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row items-center gap-16">
-          {/* Text */}
+          {/* Texto */}
           <AnimateOnScroll from="left" className="flex-1 text-center lg:text-left">
             <span className="inline-flex items-center gap-2 bg-violet-100 text-violet-700 text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
@@ -50,81 +51,15 @@ export default function Hero() {
             </div>
           </AnimateOnScroll>
 
-          {/* Dashboard mockup */}
+          {/* Maqueta del panel */}
           <AnimateOnScroll from="zoom" delay={0.2} className="flex-1 w-full max-w-lg lg:max-w-none">
             <div className="relative">
-              <div className="bg-white rounded-3xl shadow-2xl shadow-violet-100 p-6 border border-violet-50">
-                {/* Top bar */}
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="text-xs text-slate-400 font-medium">Panel de control</p>
-                    <h3 className="text-sm font-bold text-slate-700">Café La Esquina</h3>
-                  </div>
-                  <div className="w-8 h-8 rounded-xl bg-linear-to-br from-violet-400 to-pink-400 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">F</span>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-3 mb-6">
-                  {[
-                    {
-                      label: 'Clientes', value: '1.248', color: 'bg-violet-50 text-violet-700',
-                      icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
-                    },
-                    {
-                      label: 'Puntos entregados', value: '48.3K', color: 'bg-pink-50 text-pink-700',
-                      icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>,
-                    },
-                    {
-                      label: 'Canjes hoy', value: '34', color: 'bg-emerald-50 text-emerald-700',
-                      icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>,
-                    },
-                  ].map((stat) => (
-                    <div key={stat.label} className={`${stat.color} rounded-2xl p-3`}>
-                      <p className="mb-1">{stat.icon}</p>
-                      <p className="text-sm font-bold">{stat.value}</p>
-                      <p className="text-xs opacity-70 leading-tight">{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Progress bars */}
-                <div className="space-y-3 mb-5">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Recompensas activas</p>
-                  {[
-                    { name: 'Café gratis', pct: 78, color: 'bg-violet-400' },
-                    { name: 'Descuento 20%', pct: 54, color: 'bg-pink-400' },
-                    { name: 'Postre gratis', pct: 31, color: 'bg-sky-400' },
-                  ].map((r) => (
-                    <div key={r.name}>
-                      <div className="flex justify-between text-xs text-slate-500 mb-1">
-                        <span>{r.name}</span>
-                        <span>{r.pct}%</span>
-                      </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div className={`h-full ${r.color} rounded-full`} style={{ width: `${r.pct}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Recent */}
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Actividad reciente</p>
-                  {[
-                    { name: 'Ana García', action: '+50 puntos', time: 'hace 2 min', dot: 'bg-emerald-400' },
-                    { name: 'Luis Pérez', action: 'Canjeo café', time: 'hace 8 min', dot: 'bg-pink-400' },
-                    { name: 'María López', action: '+80 puntos', time: 'hace 15 min', dot: 'bg-violet-400' },
-                  ].map((item) => (
-                    <div key={item.name} className="flex items-center gap-3 text-xs">
-                      <div className={`w-2 h-2 rounded-full ${item.dot} shrink-0`} />
-                      <span className="font-medium text-slate-700 flex-1">{item.name}</span>
-                      <span className="text-slate-500">{item.action}</span>
-                      <span className="text-slate-400">{item.time}</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="rounded-3xl shadow-2xl shadow-violet-100 border border-violet-50 overflow-hidden">
+                <img
+                  src={dashboardImg}
+                  alt="Panel de cliente Gestion+"
+                  className="w-full object-contain"
+                />
               </div>
 
               {/* Floating badge */}

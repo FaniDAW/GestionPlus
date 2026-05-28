@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import AnimateOnScroll from '../components/AnimateOnScroll'
 
 const cookieTypes = [
   {
@@ -39,6 +41,8 @@ const cookieTypes = [
 ]
 
 export default function CookiesPage() {
+  useEffect(() => { window.scrollTo(0, 0) }, [])
+
   return (
     <div className="font-sans antialiased text-slate-800">
       <Navbar />
@@ -56,6 +60,7 @@ export default function CookiesPage() {
       </section>
 
       {/* Content */}
+      <AnimateOnScroll from="bottom">
       <section className="py-16 bg-white">
         <div className="max-w-3xl mx-auto px-6 space-y-10">
 
@@ -129,6 +134,7 @@ export default function CookiesPage() {
           </div>
         </div>
       </section>
+      </AnimateOnScroll>
 
       <Footer />
     </div>

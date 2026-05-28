@@ -117,12 +117,12 @@ function AppRoutes() {
       <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
 
-      {/* Customer */}
+      {/* Cliente */}
       <Route path="/dashboard" element={
         <RoleRoute roles={['customer']}><DashboardPage /></RoleRoute>
       } />
 
-      {/* Business owner */}
+      {/* Propietario de negocio */}
       <Route path="/business" element={
         <RoleRoute roles={['business_owner']}><BusinessLayout /></RoleRoute>
       }>
@@ -134,7 +134,7 @@ function AppRoutes() {
         <Route path="offers"       element={<BusinessOffers />} />
       </Route>
 
-      {/* Association admin */}
+      {/* Administrador de asociación */}
       <Route path="/association" element={
         <RoleRoute roles={['association_admin']}><AssociationLayout /></RoleRoute>
       }>
@@ -144,7 +144,7 @@ function AppRoutes() {
         <Route path="offers"     element={<AssociationOffers />} />
       </Route>
 
-      {/* Admin */}
+      {/* Administrador */}
       <Route path="/admin" element={
         <RoleRoute roles={['admin']}><AdminLayout /></RoleRoute>
       }>
@@ -157,7 +157,7 @@ function AppRoutes() {
         <Route path="offers"        element={<AdminOffers />} />
       </Route>
 
-      {/* Settings — any authenticated user */}
+      {/* Configuración — cualquier usuario autenticado */}
       <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />

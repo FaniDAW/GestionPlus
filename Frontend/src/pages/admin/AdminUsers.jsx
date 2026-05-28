@@ -158,7 +158,7 @@ export default function AdminUsers() {
 
   return (
     <div className="p-4 md:p-8">
-      {/* Header */}
+      {/* Encabezado */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800">Usuarios</h1>
@@ -175,7 +175,7 @@ export default function AdminUsers() {
         </button>
       </div>
 
-      {/* Filter */}
+      {/* Filtro */}
       <div className="mb-4 flex items-center gap-2">
         <select
           value={filter}
@@ -191,7 +191,7 @@ export default function AdminUsers() {
         )}
       </div>
 
-      {/* Desktop table */}
+      {/* Tabla escritorio */}
       <div className="hidden md:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -285,7 +285,7 @@ export default function AdminUsers() {
         </table>
       </div>
 
-      {/* Mobile cards */}
+      {/* Tarjetas móvil */}
       <div className="md:hidden space-y-3">
         {loading ? (
           Array.from({ length: 3 }).map((_, i) => (
