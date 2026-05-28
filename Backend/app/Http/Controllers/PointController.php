@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Business;
 use App\Models\GroupPoint;
 use App\Models\Point;
+use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -81,6 +82,14 @@ class PointController extends Controller
             $groupPoint->increment('total_redeemed', $data['points']);
         }
 
+        Transaction::create([
+            'user_id'     => $data['user_id'],
+            'business_id' => $data['business_id'],
+            'type'        => $data['type'],
+            'points'      => $data['points'],
+            'status'      => 'validated',
+        ]);
+
         return response()->json($groupPoint->load(['user', 'group']), 201);
     }
 
@@ -101,6 +110,14 @@ class PointController extends Controller
             $point->decrement('balance', $data['points']);
             $point->increment('total_redeemed', $data['points']);
         }
+
+        Transaction::create([
+            'user_id'     => $data['user_id'],
+            'business_id' => $data['business_id'],
+            'type'        => $data['type'],
+            'points'      => $data['points'],
+            'status'      => 'validated',
+        ]);
 
         return response()->json($point->load(['user', 'business']), 201);
     }

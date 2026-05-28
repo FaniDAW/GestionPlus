@@ -26,6 +26,16 @@ class TransactionController extends Controller
         return response()->json($query->latest()->get());
     }
 
+    public function myRedeemedRewards(Request $request): JsonResponse
+    {
+        $ids = Transaction::where('user_id', $request->user()->id)
+            ->where('type', 'redeem')
+            ->where('redeemable_type', 'reward')
+            ->pluck('redeemable_id');
+
+        return response()->json($ids);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts'
+import { useLocation } from 'react-router-dom'
 import api from '../../lib/api'
 
 const MONTHS_ES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
@@ -22,8 +20,8 @@ const STAT_CARDS = [
     key: 'total_customers',
     label: 'Total clientes',
     source: 'business',
-    color: 'from-violet-500 to-violet-600',
-    shadow: 'shadow-violet-200',
+    color: 'from-pink-500 to-rose-500',
+    shadow: 'shadow-pink-200',
     icon: (
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -35,8 +33,8 @@ const STAT_CARDS = [
     key: 'this_month_points',
     label: 'Puntos emitidos este mes',
     source: 'stats',
-    color: 'from-pink-500 to-rose-500',
-    shadow: 'shadow-pink-200',
+    color: 'from-violet-500 to-violet-600',
+    shadow: 'shadow-violet-200',
     icon: (
       <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -60,31 +58,48 @@ const STAT_CARDS = [
 ]
 
 const RANK_STYLES = [
-  { bar: 'from-amber-400 to-orange-400', label: '1°' },
-  { bar: 'from-slate-400 to-slate-500',  label: '2°' },
-  { bar: 'from-orange-300 to-amber-300', label: '3°' },
+  { bar: 'from-violet-500 to-pink-500',   label: '1°' },
+  { bar: 'from-slate-400 to-slate-500',   label: '2°' },
+  { bar: 'from-violet-300 to-violet-400', label: '3°' },
 ]
 
 export default function BusinessOverview() {
+  const location = useLocation()
+
   const [business, setBusiness]   = useState(null)
   const [statsData, setStatsData] = useState(null)
   const [loading, setLoading]     = useState(true)
   const [notFound, setNotFound]   = useState(false)
+  const [barsReady, setBarsReady] = useState(false)
 
   useEffect(() => {
-    api.get('/my-business')
-      .then(async (bizRes) => {
-        setBusiness(bizRes.data)
-        try {
-          const statsRes = await api.get('/my-business/stats')
-          setStatsData(statsRes.data)
-        } catch { /* degraded gracefully — show zeros */ }
-      })
-      .catch((err) => { if (err.response?.status === 404) setNotFound(true) })
-      .finally(() => setLoading(false))
-  }, [])
+    const fetchStats = () => {
+      setStatsData(null)
 
-  const months = getLast6Months()
+      api.get('/my-business')
+        .then(async (bizRes) => {
+          setBusiness(bizRes.data)
+          try {
+            const statsRes = await api.get('/my-business/stats', {
+              headers: { 'Cache-Control': 'no-cache' },
+            })
+            setStatsData(statsRes.data)
+          } catch { /* degradación controlada — mostrar ceros */ }
+        })
+        .catch((err) => { if (err.response?.status === 404) setNotFound(true) })
+        .finally(() => setLoading(false))
+    }
+
+    fetchStats()
+    window.addEventListener('focus', fetchStats)
+    return () => window.removeEventListener('focus', fetchStats)
+  }, [location])
+
+  useEffect(() => {
+    if (!loading) requestAnimationFrame(() => setBarsReady(true))
+  }, [loading])
+
+  const months = getLast6Months().reverse()
   const chartData = months.map((m) => ({
     month: m.label,
     puntos: Number(statsData?.monthly_points?.find((mp) => mp.month === m.key)?.total_points ?? 0),
@@ -119,7 +134,7 @@ export default function BusinessOverview() {
 
   return (
     <div className="p-8 space-y-6">
-      {/* Header */}
+      {/* Encabezado */}
       <div>
         {loading ? (
           <div className="h-7 bg-slate-100 rounded-lg animate-pulse w-48 mb-2" />
@@ -129,7 +144,7 @@ export default function BusinessOverview() {
         <p className="text-slate-500 text-sm mt-1">Resumen de actividad de tu negocio</p>
       </div>
 
-      {/* Stat cards */}
+      {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         {STAT_CARDS.map((card) => (
           <div
@@ -153,56 +168,47 @@ export default function BusinessOverview() {
         ))}
       </div>
 
-      {/* Chart + Top Rewards */}
+      {/* Gráfico + Top recompensas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        {/* Bar chart */}
+        {/* Puntos mensuales — barras CSS */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h2 className="text-base font-bold text-slate-800 mb-6">Puntos emitidos — últimos 6 meses</h2>
           {loading ? (
-            <div className="h-52 bg-slate-100 rounded-xl animate-pulse" />
-          ) : (
-            <ResponsiveContainer width="100%" height={208}>
-              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%"   stopColor="#8b5cf6" />
-                    <stop offset="100%" stopColor="#c4b5fd" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 12, fill: '#94a3b8' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={40}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.10)',
-                    padding: '10px 14px',
-                  }}
-                  labelStyle={{ color: '#1e293b', fontWeight: 700, marginBottom: 2 }}
-                  itemStyle={{ color: '#7c3aed' }}
-                  formatter={(value) => [`${Number(value).toLocaleString()} pts`, 'Puntos']}
-                  cursor={{ fill: '#f5f3ff' }}
-                />
-                <Bar dataKey="puntos" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={52} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
+            <div className="space-y-4">
+              {[0,1,2,3,4,5].map((i) => (
+                <div key={i} className="h-8 bg-slate-100 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : (() => {
+            const maxPts = Math.max(...chartData.map((r) => r.puntos), 1)
+            return (
+              <div className="space-y-4">
+                {chartData.map((row) => {
+                  const pct = Math.round((row.puntos / maxPts) * 100)
+                  return (
+                    <div key={row.month}>
+                      <div className="flex justify-between text-xs text-slate-500 mb-1.5">
+                        <span className="font-semibold text-slate-700">{row.month}</span>
+                        <span className="tabular-nums font-semibold text-violet-600">
+                          {row.puntos > 0 ? row.puntos.toLocaleString() + ' pts' : '—'}
+                        </span>
+                      </div>
+                      <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+                          style={{ width: barsReady ? `${pct}%` : '0%' }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
         </div>
 
-        {/* Top rewards */}
+        {/* Top recompensas */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <h2 className="text-base font-bold text-slate-800 mb-6">Top recompensas canjeadas</h2>
 

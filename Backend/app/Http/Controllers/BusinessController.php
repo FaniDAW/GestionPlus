@@ -53,18 +53,18 @@ class BusinessController extends Controller
             return response()->json(['message' => 'No tienes un negocio registrado.'], 404);
         }
 
-        $thisMonth    = now()->startOfMonth();
         $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
 
         $thisMonthPoints = $business->transactions()
             ->where('type', 'earn')
-            ->where('created_at', '>=', $thisMonth)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->sum('points');
 
         $thisMonthRedemptions = $business->transactions()
             ->where('type', 'redeem')
-            ->where('status', 'validated')
-            ->where('created_at', '>=', $thisMonth)
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
             ->count();
 
         $monthlyPoints = $business->transactions()
