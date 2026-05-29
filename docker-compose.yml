@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: gestionplus_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gestionplus
+      MYSQL_USER: gestionplus
+      MYSQL_PASSWORD: gestionplus
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  backend:
+    build: ./Backend
+    container_name: gestionplus_backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: http://gestionplus.app
+
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: gestionplus
+      DB_USERNAME: gestionplus
+      DB_PASSWORD: gestionplus
+      FRONTEND_URL: http://gestionplus.app
+    volumes:
+      - ./Backend:/var/www/html
+    ports:
+      - "8080:80"
+
+  frontend:
+    build: ./Frontend
+    container_name: gestionplus_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+
+
+volumes:
+  db_data:
