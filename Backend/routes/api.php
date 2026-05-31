@@ -31,7 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user',  [UserController::class, 'deleteAccount']);
     Route::get('/me/qr',   [QrController::class, 'show']);
 
-    Route::post('/stripe/checkout', [StripeController::class, 'createCheckoutSession']);
+    Route::post('/stripe/checkout',         [StripeController::class, 'createCheckoutSession']);
+    Route::get('/stripe/checkout/success',  [StripeController::class, 'handleCheckoutSuccess']);
 
     // Ofertas — acceso y filtrado por rol dentro del controlador
     Route::apiResource('offers', OfferController::class);

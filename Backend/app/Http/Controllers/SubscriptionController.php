@@ -43,7 +43,7 @@ class SubscriptionController extends Controller
 
     public function index(): JsonResponse
     {
-        return response()->json(Subscription::with('business')->get());
+        return response()->json(Subscription::with(['business', 'group'])->get());
     }
 
     public function store(Request $request): JsonResponse

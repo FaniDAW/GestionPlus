@@ -12,7 +12,7 @@ class BusinessController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Business::with('owner')->get());
+        return response()->json(Business::with(['owner', 'groups'])->get());
     }
 
     public function myBusiness(Request $request): JsonResponse

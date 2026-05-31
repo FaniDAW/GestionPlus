@@ -31,4 +31,9 @@ class Subscription extends Model
     {
         return $this->belongsTo(Business::class);
     }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
 }

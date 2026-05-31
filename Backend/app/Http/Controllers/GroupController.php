@@ -93,9 +93,10 @@ class GroupController extends Controller
             return response()->json(['message' => 'No tienes un grupo asignado.'], 404);
         }
 
-        // Solo negocios que todavía no pertenecen a ningún grupo
+        // Solo negocios de propietarios individuales que todavía no pertenecen a ningún grupo
         $businesses = Business::with('owner')
             ->whereDoesntHave('groups')
+            ->whereHas('owner', fn ($q) => $q->where('role', 'business_owner'))
             ->orderBy('name')
             ->get(['id', 'name', 'email', 'address', 'is_active', 'owner_id']);
 
