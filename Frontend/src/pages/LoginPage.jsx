@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { getDashboardPath } from '../lib/roles'
 import { useState } from 'react'
@@ -14,6 +14,7 @@ const schema = z.object({
 export default function LoginPage() {
   const { login }    = useAuth()
   const navigate     = useNavigate()
+  const [searchParams] = useSearchParams()
   const [serverError, setServerError] = useState('')
 
   const {
@@ -26,7 +27,16 @@ export default function LoginPage() {
     setServerError('')
     try {
       const result = await login(data.email, data.password)
-      navigate(getDashboardPath(result.user.role))
+      const redirectPath = searchParams.get('redirect')
+      const sessionId    = searchParams.get('session_id')
+      if (redirectPath) {
+        const dest = sessionId
+          ? `${redirectPath}?session_id=${encodeURIComponent(sessionId)}`
+          : redirectPath
+        navigate(dest, { replace: true })
+      } else {
+        navigate(getDashboardPath(result.user.role))
+      }
     } catch (err) {
       setServerError(err.response?.data?.message || 'Error al iniciar sesión. Inténtalo de nuevo.')
     }

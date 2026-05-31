@@ -19,6 +19,13 @@ export default function CheckoutSuccessPage() {
       return
     }
 
+    const token = localStorage.getItem('token')
+    console.log('[CheckoutSuccess] token en localStorage:', token)
+    if (!token) {
+      navigate(`/login?redirect=/checkout/success&session_id=${encodeURIComponent(sessionId)}`, { replace: true })
+      return
+    }
+
     api.get(`/stripe/checkout/success?session_id=${encodeURIComponent(sessionId)}`)
       .then(async () => {
         localStorage.removeItem('stripe_session_id')

@@ -179,9 +179,14 @@ export default function RegisterPage() {
         if (selectedPlan === 'individual') {
           payload.business_name = data.business_name
         }
-        await authRegister(payload)
+        const userData = await authRegister(payload)
         setLoadingCheckout(true)
-        const res = await api.post('/stripe/checkout', { plan: selectedPlan, billing, email: data.email })
+        const newToken = localStorage.getItem('token')
+        const res = await api.post(
+          '/stripe/checkout',
+          { plan: selectedPlan, billing, email: data.email },
+          { headers: { Authorization: `Bearer ${newToken}` } }
+        )
         localStorage.setItem('stripe_session_id', res.data.session_id)
         window.location.href = res.data.checkout_url
         return
