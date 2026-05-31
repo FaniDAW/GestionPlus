@@ -24,6 +24,9 @@ Route::get('/invitation/{token}', [GroupController::class, 'resolveInvitation'])
 // Webhook de Stripe (sin auth, con firma)
 Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
 
+// Retorno de Stripe tras el pago (sin auth — el token puede haber expirado)
+Route::get('/stripe/checkout/success', [StripeController::class, 'handleCheckoutSuccess']);
+
 // Rutas protegidas — cualquier usuario autenticado
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',  [AuthController::class, 'logout']);
@@ -31,8 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user',  [UserController::class, 'deleteAccount']);
     Route::get('/me/qr',   [QrController::class, 'show']);
 
-    Route::post('/stripe/checkout',         [StripeController::class, 'createCheckoutSession']);
-    Route::get('/stripe/checkout/success',  [StripeController::class, 'handleCheckoutSuccess']);
+    Route::post('/stripe/checkout', [StripeController::class, 'createCheckoutSession']);
 
     // Ofertas — acceso y filtrado por rol dentro del controlador
     Route::apiResource('offers', OfferController::class);

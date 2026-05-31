@@ -40,7 +40,13 @@ class StripeController extends Controller
 
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        $user = auth()->user();
+        // El email del body identifica al usuario recién registrado con certeza,
+        // independientemente del token activo en el cliente (evita race condition).
+        $user = User::where('email', $data['email'])->first() ?? auth()->user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Usuario no encontrado.'], 404);
+        }
 
         $session = Session::create([
             'payment_method_types' => ['card'],
@@ -79,10 +85,13 @@ class StripeController extends Controller
         $session = Session::retrieve($data['session_id']);
 
         $userId = $session->metadata->user_id ?? null;
-        $user   = auth()->user();
+        if (! $userId) {
+            return response()->json(['message' => 'Sesión no válida.'], 403);
+        }
 
-        if (! $userId || (int) $userId !== $user->id) {
-            return response()->json(['message' => 'Sesión no válida para este usuario.'], 403);
+        $user = User::with(['group', 'businesses'])->find($userId);
+        if (! $user) {
+            return response()->json(['message' => 'Usuario no encontrado.'], 404);
         }
 
         $plan    = $session->metadata->plan    ?? null;
@@ -94,8 +103,6 @@ class StripeController extends Controller
 
         $meta  = self::PLAN_META[$plan];
         $price = $meta[$billing] ?? $meta['monthly'];
-
-        $user->update(['role' => $this->roleForPlan($plan)]);
 
         $subData = [
             'plan_name'         => $meta['name'],
@@ -116,12 +123,14 @@ class StripeController extends Controller
             }
             Subscription::updateOrCreate(['group_id' => $group->id], $subData);
         } else {
-            $business = $user->businesses()->first();
+            $business = $user->businesses->first();
             if (! $business) {
                 return response()->json(['message' => 'No se encontró el negocio asociado al usuario.'], 422);
             }
             Subscription::updateOrCreate(['business_id' => $business->id], $subData);
         }
+
+        $user->update(['role' => $this->roleForPlan($plan)]);
 
         return response()->json(['message' => 'Suscripción activada correctamente.']);
     }
@@ -166,13 +175,11 @@ class StripeController extends Controller
 
         $meta  = self::PLAN_META[$plan];
         $price = $meta[$billing] ?? $meta['monthly'];
-        $user  = User::find($userId);
+        $user  = User::with(['group', 'businesses'])->find($userId);
 
         if (! $user) {
             return;
         }
-
-        $user->update(['role' => $this->roleForPlan($plan)]);
 
         $subData = [
             'plan_name'         => $meta['name'],
@@ -191,9 +198,11 @@ class StripeController extends Controller
             if (! $group) return;
             Subscription::updateOrCreate(['group_id' => $group->id], $subData);
         } else {
-            $business = $user->businesses()->first();
+            $business = $user->businesses->first();
             if (! $business) return;
             Subscription::updateOrCreate(['business_id' => $business->id], $subData);
         }
+
+        $user->update(['role' => $this->roleForPlan($plan)]);
     }
 }
