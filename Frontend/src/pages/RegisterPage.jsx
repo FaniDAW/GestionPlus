@@ -181,7 +181,8 @@ export default function RegisterPage() {
         }
         await authRegister(payload)
         setLoadingCheckout(true)
-        const res = await api.post('/stripe/checkout', { plan: selectedPlan, billing })
+        const res = await api.post('/stripe/checkout', { plan: selectedPlan, billing, email: data.email })
+        localStorage.setItem('stripe_session_id', res.data.session_id)
         window.location.href = res.data.checkout_url
         return
       }
