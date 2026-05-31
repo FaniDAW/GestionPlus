@@ -19,21 +19,9 @@ services:
     restart: always
     depends_on:
       - db
-    environment:
-      APP_ENV: production
-      APP_DEBUG: false
-      APP_URL: http://gestionplus.app
-
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: gestionplus
-      DB_USERNAME: gestionplus
-      DB_PASSWORD: gestionplus
-      FRONTEND_URL: http://gestionplus.app
-    volumes:
-      - ./Backend:/var/www/html
     ports:
       - "8080:80"
+
 
   frontend:
     build: ./Frontend

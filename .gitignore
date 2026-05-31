@@ -9,8 +9,13 @@
 .DS_Store
 Thumbs.db
 
+ssl/
+
 # Backend (Laravel)
 Backend/.env
+Backend/.env.docker
+
+
 Backend/.env.backup
 Backend/.env.production
 Backend/vendor/
