@@ -25,7 +25,7 @@ export default function AdminBusinesses() {
   useEffect(() => {
     Promise.all([api.get('/businesses'), api.get('/subscriptions')])
       .then(([bizRes, subRes]) => {
-        setBusinesses(bizRes.data)
+        setBusinesses(bizRes.data.filter((b) => !b.groups?.length))
         // Indexar la suscripción más reciente por business_id
         const map = {}
         subRes.data.forEach((s) => {

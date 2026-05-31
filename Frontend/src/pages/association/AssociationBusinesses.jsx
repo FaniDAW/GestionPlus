@@ -11,10 +11,12 @@ function AddExistingModal({ group, onClose, onAdded }) {
   const [selectedId, setSelectedId] = useState(null)
   const [adding, setAdding]         = useState(false)
   const [error, setError]           = useState('')
+  const [loadError, setLoadError]   = useState('')
 
   useEffect(() => {
     api.get('/my-group/available-businesses')
       .then((res) => setAvailable(res.data))
+      .catch((err) => setLoadError(err.response?.data?.message || 'Error al cargar los negocios disponibles.'))
       .finally(() => setLoadingAvail(false))
   }, [])
 
@@ -111,6 +113,10 @@ function AddExistingModal({ group, onClose, onAdded }) {
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-16 rounded-2xl bg-slate-100 animate-pulse" />
             ))
+          ) : loadError ? (
+            <div className="py-12 text-center">
+              <p className="text-red-500 text-sm font-medium">{loadError}</p>
+            </div>
           ) : filtered.length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-slate-400 text-sm">
@@ -199,13 +205,14 @@ function AddExistingModal({ group, onClose, onAdded }) {
 // ─── Sección invitación ──────────────────────────────────────────────────────
 
 function InviteSection({ group, onTokenGenerated }) {
-  const [generating, setGenerating] = useState(false)
-  const [copied, setCopied]         = useState(false)
+  const [generating, setGenerating]   = useState(false)
+  const [generateError, setGenerateError] = useState('')
+  const [copied, setCopied]           = useState(false)
 
   // Estado del formulario de invitación por email
-  const [email, setEmail]       = useState('')
-  const [sending, setSending]   = useState(false)
-  const [sent, setSent]         = useState(false)
+  const [email, setEmail]           = useState('')
+  const [sending, setSending]       = useState(false)
+  const [sent, setSent]             = useState(false)
   const [emailError, setEmailError] = useState('')
 
   const inviteUrl = group?.invitation_token
@@ -214,9 +221,12 @@ function InviteSection({ group, onTokenGenerated }) {
 
   const handleGenerate = async () => {
     setGenerating(true)
+    setGenerateError('')
     try {
       await api.post('/my-group/invitation')
       onTokenGenerated()
+    } catch (err) {
+      setGenerateError(err.response?.data?.message || 'Error al generar el enlace.')
     } finally {
       setGenerating(false)
     }
@@ -358,6 +368,14 @@ function InviteSection({ group, onTokenGenerated }) {
           </button>
         </div>
 
+        {generateError && (
+          <p className="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
+            <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            {generateError}
+          </p>
+        )}
         {inviteUrl ? (
           <div className="flex gap-2">
             <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs text-slate-600 font-mono truncate">

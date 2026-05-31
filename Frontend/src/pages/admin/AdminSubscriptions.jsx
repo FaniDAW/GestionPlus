@@ -37,7 +37,7 @@ export default function AdminSubscriptions() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
-              <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Negocio</th>
+              <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Negocio / Asociación</th>
               <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Plan</th>
               <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Precio</th>
               <th className="text-left px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
@@ -74,7 +74,7 @@ export default function AdminSubscriptions() {
                     className={`transition-colors ${expired ? 'bg-red-50/40 hover:bg-red-50/70' : 'hover:bg-violet-50/40'}`}
                   >
                     <td className="px-6 py-4 font-semibold text-slate-800">
-                      {sub.business?.name ?? '—'}
+                      {sub.business?.name ?? sub.group?.name ?? '—'}
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700">
@@ -124,7 +124,7 @@ export default function AdminSubscriptions() {
               <div key={sub.id} className={`bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3 ${expired ? 'border-red-100' : ''}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-semibold text-slate-800">{sub.business?.name ?? '—'}</p>
+                    <p className="font-semibold text-slate-800">{sub.business?.name ?? sub.group?.name ?? '—'}</p>
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-100 text-violet-700 mt-1">
                       {sub.plan_name}
                     </span>

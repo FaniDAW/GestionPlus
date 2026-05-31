@@ -14,6 +14,7 @@ import Footer from './components/Footer'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
+import CheckoutSuccessPage from './pages/CheckoutSuccessPage'
 
 import BusinessLayout from './pages/business/BusinessLayout'
 import BusinessOverview from './pages/business/BusinessOverview'
@@ -116,6 +117,7 @@ function AppRoutes() {
 
       <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+      <Route path="/checkout/success" element={<PrivateRoute><CheckoutSuccessPage /></PrivateRoute>} />
 
       {/* Cliente */}
       <Route path="/dashboard" element={

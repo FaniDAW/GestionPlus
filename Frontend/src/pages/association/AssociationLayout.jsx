@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../lib/api'
 
 const navItems = [
   {
@@ -35,13 +36,16 @@ const navItems = [
   },
 ]
 
-function SidebarContent({ user, onLogout, onClose }) {
+function SidebarContent({ user, groupName, onLogout, onClose }) {
   return (
     <>
       <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div>
             <img src="/logo.svg" alt="Gestion+" className="h-10 w-auto" />
+            {groupName && (
+              <p className="text-slate-800 text-sm font-semibold mt-1 truncate max-w-[160px]">{groupName}</p>
+            )}
             <p className="text-slate-400 text-xs font-medium mt-0.5">Panel Asociación</p>
           </div>
         </div>
@@ -121,6 +125,11 @@ export default function AssociationLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [groupName, setGroupName] = useState('')
+
+  useEffect(() => {
+    api.get('/my-group').then((res) => setGroupName(res.data.name ?? '')).catch(() => {})
+  }, [])
 
   const handleLogout = async () => {
     await logout()
@@ -143,7 +152,7 @@ export default function AssociationLayout() {
         lg:static lg:translate-x-0 lg:z-auto lg:shrink-0
         ${open ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <SidebarContent user={user} onLogout={handleLogout} onClose={() => setOpen(false)} />
+        <SidebarContent user={user} groupName={groupName} onLogout={handleLogout} onClose={() => setOpen(false)} />
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
