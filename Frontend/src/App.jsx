@@ -6,6 +6,7 @@ import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Features from './components/Features'
 import HowItWorks from './components/HowItWorks'
+import DevicesSection from './components/DevicesSection'
 import Pricing from './components/Pricing'
 import Testimonials from './components/Testimonials'
 import CTASection from './components/CTASection'
@@ -32,7 +33,6 @@ import ContactPage from './pages/ContactPage'
 import SobreNosotrosPage from './pages/SobreNosotrosPage'
 import BlogPage from './pages/BlogPage'
 import ClientesPage from './pages/ClientesPage'
-import PrivacidadPage from './pages/PrivacidadPage'
 import TerminosPage from './pages/TerminosPage'
 import CookiesPage from './pages/CookiesPage'
 import AyudaPage from './pages/AyudaPage'
@@ -72,6 +72,7 @@ function LandingPage() {
         <Hero />
         <Features />
         <HowItWorks />
+        <DevicesSection />
         <AssociationSection />
         <Pricing />
         <Testimonials />
@@ -110,7 +111,6 @@ function AppRoutes() {
       <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
       <Route path="/blog"           element={<BlogPage />} />
       <Route path="/clientes"       element={<ClientesPage />} />
-      <Route path="/privacidad"     element={<PrivacidadPage />} />
       <Route path="/terminos"       element={<TerminosPage />} />
       <Route path="/cookies"        element={<CookiesPage />} />
       <Route path="/ayuda"          element={<AyudaPage />} />
