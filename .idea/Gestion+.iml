@@ -7,12 +7,19 @@
       <sourceFolder url="file://$MODULE_DIR$/Backend/database/factories" isTestSource="false" packagePrefix="Database\Factories\" />
       <sourceFolder url="file://$MODULE_DIR$/Backend/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
       <sourceFolder url="file://$MODULE_DIR$/Backend/tests" isTestSource="true" packagePrefix="Tests\" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/archtechx/enums" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/bacon/bacon-qr-code" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/carbonphp/carbon-doctrine-types" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/codezero/browser-locale" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/dasprid/enum" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/dflydev/dot-access-data" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/inflector" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/lexer" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/dragon-code/contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/dragon-code/pretty-array" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/dragon-code/support" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/dragonmantank/cron-expression" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/egulias/email-validator" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/fakerphp/faker" />
@@ -24,6 +31,23 @@
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/guzzlehttp/psr7" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/guzzlehttp/uri-template" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/hamcrest/hamcrest-php" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/actions" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/attributes" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/common" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/config" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/http-statuses" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/json-fallback" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/lang" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/locale-list" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/locales" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/models" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/moonshine" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/native-country-names" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/native-currency-names" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/native-locale-names" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/publisher" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/routes" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel-lang/starter-kits" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel/framework" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel/pail" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/laravel/pint" />
@@ -84,6 +108,7 @@
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/recursion-context" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/type" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/version" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/simplesoftwareio/simple-qrcode" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/staabm/side-effects-detector" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/stripe/stripe-php" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/symfony/clock" />

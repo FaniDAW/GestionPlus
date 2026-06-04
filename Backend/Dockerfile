@@ -32,7 +32,7 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 ##### configuracion docker
 # Copiar el .env de producción
-RUN cp .env.docker .env
+RUN cp .env.example .env
 
 # Generar la APP_KEY
 RUN php artisan key:generate --force
