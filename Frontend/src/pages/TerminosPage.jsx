@@ -79,7 +79,7 @@ La responsabilidad máxima de Gestion+ se limita al importe abonado en los últi
   },
   {
     title: '12. Legislación aplicable',
-    content: `Estos Términos se rigen por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales de Madrid, salvo que la normativa de protección del consumidor establezca otro fuero.
+    content: `Estos Términos se rigen por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales de Alicante, salvo que la normativa de protección del consumidor establezca otro fuero.
 
 Última actualización: 1 de enero de 2026.`,
   },

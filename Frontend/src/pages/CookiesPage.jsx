@@ -129,7 +129,7 @@ export default function CookiesPage() {
             <h2 className="text-lg font-bold text-slate-800 mb-3">Contacto</h2>
             <p className="text-slate-500 text-sm leading-relaxed">
               Si tienes preguntas sobre el uso de cookies, escríbenos a{' '}
-              <span className="text-violet-600 font-medium">privacidad@gestionplus.com</span>.
+              <span className="text-violet-600 font-medium">hola@gestionplus.app</span>.
             </p>
           </div>
         </div>

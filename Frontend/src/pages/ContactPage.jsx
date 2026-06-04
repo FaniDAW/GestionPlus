@@ -54,7 +54,7 @@ export default function ContactPage() {
               {[
                 {
                   title: 'Email',
-                  detail: 'hola@gestionplus.com',
+                  detail: 'hola@gestionplus.app',
                   sub: 'Respondemos en menos de 24 h',
                   bg: 'bg-violet-50',
                   iconBg: 'bg-violet-100 text-violet-600',
@@ -78,7 +78,7 @@ export default function ContactPage() {
                 },
                 {
                   title: 'Oficina',
-                  detail: 'Calle Mayor 12, Madrid',
+                  detail: 'Calle Mayor 12, Villajoyosa',
                   sub: 'España, 28001',
                   bg: 'bg-sky-50',
                   iconBg: 'bg-sky-100 text-sky-600',

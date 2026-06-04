@@ -38,9 +38,9 @@ function BusinessMockup() {
     return () => observer.disconnect()
   }, [])
 
-  const c1 = useCountUp(1248, 1400, started)
-  const c2 = useCountUp(48,   1200, started)
-  const c3 = useCountUp(34,   1000, started)
+  const c1 = useCountUp(10,   1400, started)
+  const c2 = useCountUp(1755, 1200, started)
+  const c3 = useCountUp(6,    1000, started)
 
   const stats = [
     {
@@ -50,8 +50,8 @@ function BusinessMockup() {
       icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
     },
     {
-      label: 'Pts emitidos',
-      display: `${c2}K`,
+      label: 'Puntos emitidos',
+      display: `${c2}`,
       color: 'bg-pink-50 text-pink-600',
       icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>,
     },
@@ -64,9 +64,9 @@ function BusinessMockup() {
   ]
 
   const bars = [
-    { name: 'Café gratis',   pts: '100 pts', pct: 78, color: 'bg-violet-400' },
-    { name: 'Descuento 20%', pts: '200 pts', pct: 54, color: 'bg-pink-400'   },
-    { name: 'Postre gratis', pts: '150 pts', pct: 31, color: 'bg-emerald-400' },
+    { name: 'Café gratis',   pts: '8x', pct: 100, color: 'bg-violet-400'  },
+    { name: 'Postre gratis', pts: '5x', pct: 62,  color: 'bg-emerald-400' },
+    { name: 'Descuento 20%', pts: '3x', pct: 37,  color: 'bg-pink-400'    },
   ]
 
   return (
@@ -100,7 +100,7 @@ function BusinessMockup() {
 
       {/* Barras animadas */}
       <div className="space-y-2.5">
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Recompensas activas</p>
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Top recompensas canjeadas</p>
         {bars.map((r) => (
           <div key={r.name}>
             <div className="flex justify-between text-xs text-slate-500 mb-1">
@@ -151,10 +151,9 @@ const groupPlans = [
     highlight: false,
     features: [
       'Hasta 20 negocios',
-      'Puntos compartidos entre negocios',
-      'Panel de gestión para la asociación',
-      'Ofertas de grupo para toda la red',
-      'Estadísticas del grupo',
+      'Panel de gestión de negocios',
+      'Ofertas del grupo para toda la red',
+      'Resumen de actividad del grupo',
       'Soporte prioritario',
     ],
   },
@@ -169,10 +168,6 @@ const groupPlans = [
     features: [
       'Hasta 50 negocios',
       'Todo lo del plan S',
-      'Segmentación de clientes',
-      'Campañas de puntos por temporada',
-      'Exportación de datos',
-      'Manager de cuenta dedicado',
     ],
   },
   {
@@ -188,8 +183,6 @@ const groupPlans = [
       'Todo lo del plan M',
       'Integración con webs municipales',
       'Branding personalizado',
-      'API acceso completo',
-      'SLA garantizado',
     ],
   },
 ]
@@ -362,7 +355,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center text-sm text-slate-400 mt-12">
-          Todos los planes incluyen 14 días de prueba gratuita. No se requiere tarjeta de crédito.
+          Todos los planes incluyen 14 días de prueba gratuita.
         </p>
       </div>
     </section>

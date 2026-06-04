@@ -109,7 +109,7 @@ const categories = [
       },
       {
         q: '¿Cómo contacto con soporte?',
-        a: 'Puedes escribirnos a través del formulario de contacto o directamente a hola@gestionplus.com. Respondemos en menos de 24 horas en días laborables.',
+        a: 'Puedes escribirnos a través del formulario de contacto o directamente a hola@gestionplus.app. Respondemos en menos de 24 horas en días laborables.',
       },
     ],
   },
