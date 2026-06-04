@@ -7,7 +7,6 @@ const routes = {
   'Blog': '/blog',
   'Clientes': '/clientes',
   'Contacto': '/contacto',
-  'Privacidad': '/privacidad',
   'Términos de uso': '/terminos',
   'Cookies': '/cookies',
   'Centro de ayuda': '/ayuda',
@@ -15,7 +14,7 @@ const routes = {
 
 const otherLinks = {
   Empresa: ['Sobre nosotros', 'Blog', 'Clientes', 'Contacto'],
-  Legal: ['Privacidad', 'Términos de uso', 'Cookies'],
+  Legal: ['Términos de uso', 'Cookies'],
   Soporte: ['Centro de ayuda'],
 }
 

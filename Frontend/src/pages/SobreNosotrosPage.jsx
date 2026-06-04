@@ -4,43 +4,54 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import AnimateOnScroll from '../components/AnimateOnScroll'
 
-const team = [
-  { name: 'Carlos Romero', role: 'CEO & Cofundador', color: 'bg-violet-400', initial: 'C' },
-  { name: 'Laura Martín', role: 'CTO & Cofundadora', color: 'bg-pink-400', initial: 'L' },
-  { name: 'Sergio Vidal', role: 'Director de Producto', color: 'bg-sky-400', initial: 'S' },
-  { name: 'Ana Torres', role: 'Directora de Clientes', color: 'bg-emerald-400', initial: 'A' },
-  { name: 'Pablo Ruiz', role: 'Lead Engineer', color: 'bg-amber-400', initial: 'P' },
-  { name: 'Marta Gil', role: 'Diseño & UX', color: 'bg-rose-400', initial: 'M' },
-]
-
 const values = [
   {
     title: 'Cercanía',
     desc: 'Hablamos el idioma de los negocios locales. Sin tecnicismos, sin complejidad.',
-    bg: 'bg-violet-50', icon: '🤝',
+    bg: 'bg-violet-50', iconBg: 'bg-violet-100', iconColor: 'text-violet-600',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
   },
   {
     title: 'Simplicidad',
     desc: 'Cada función existe porque resuelve un problema real. Sin relleno.',
-    bg: 'bg-pink-50', icon: '✦',
+    bg: 'bg-pink-50', iconBg: 'bg-pink-100', iconColor: 'text-pink-600',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+      </svg>
+    ),
   },
   {
     title: 'Impacto local',
     desc: 'Creemos en el comercio local como motor de comunidad y economía.',
-    bg: 'bg-sky-50', icon: '📍',
+    bg: 'bg-sky-50', iconBg: 'bg-sky-100', iconColor: 'text-sky-600',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
   },
   {
     title: 'Transparencia',
     desc: 'Sin letra pequeña, sin sorpresas. Lo que ves es lo que pagas.',
-    bg: 'bg-emerald-50', icon: '🔍',
+    bg: 'bg-emerald-50', iconBg: 'bg-emerald-100', iconColor: 'text-emerald-600',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    ),
   },
 ]
 
 const stats = [
-  { value: '+2.400', label: 'Negocios activos' },
-  { value: '+180K', label: 'Clientes fidelizados' },
+  { value: '+240', label: 'Negocios activos' },
+  { value: '+10K', label: 'Clientes fidelizados' },
   { value: '4.9/5', label: 'Valoración media' },
-  { value: '12', label: 'Países' },
 ]
 
 export default function SobreNosotrosPage() {
@@ -66,7 +77,7 @@ export default function SobreNosotrosPage() {
             </span>
           </h1>
           <p className="text-lg text-slate-500 leading-relaxed">
-            Gestion+ nació en 2022 con una idea simple: que cualquier negocio, por pequeño que sea, pueda fidelizar clientes con las mismas herramientas que las grandes cadenas.
+            Gestion+ nació con una idea simple: que cualquier negocio, por pequeño que sea, pueda fidelizar clientes con las mismas herramientas que las grandes cadenas.
           </p>
         </div>
       </section>
@@ -74,7 +85,7 @@ export default function SobreNosotrosPage() {
       {/* Stats */}
       <AnimateOnScroll from="bottom">
       <section className="py-14 bg-white border-y border-slate-100">
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div className="max-w-5xl mx-auto px-6 grid grid-cols-3 gap-8 text-center">
           {stats.map((s) => (
             <div key={s.label}>
               <p className="text-3xl font-extrabold bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text text-transparent">{s.value}</p>
@@ -123,32 +134,11 @@ export default function SobreNosotrosPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {values.map((v) => (
               <div key={v.title} className={`${v.bg} rounded-2xl p-6`}>
-                <span className="text-2xl mb-3 block">{v.icon}</span>
+                <div className={`w-12 h-12 ${v.iconBg} ${v.iconColor} rounded-2xl flex items-center justify-center mb-4`}>
+                  {v.icon}
+                </div>
                 <h3 className="font-bold text-slate-800 mb-2">{v.title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{v.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      </AnimateOnScroll>
-
-      {/* Equipo */}
-      <AnimateOnScroll from="bottom" delay={0.05}>
-      <section className="py-20 bg-white">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <span className="text-xs font-semibold text-violet-600 uppercase tracking-widest mb-3 block">Equipo</span>
-            <h2 className="text-3xl font-extrabold text-slate-800">Las personas detrás de Gestion+</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-            {team.map((p) => (
-              <div key={p.name} className="text-center">
-                <div className={`w-16 h-16 rounded-2xl ${p.color} flex items-center justify-center text-white text-xl font-extrabold mx-auto mb-3`}>
-                  {p.initial}
-                </div>
-                <p className="font-bold text-slate-800 text-sm">{p.name}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{p.role}</p>
               </div>
             ))}
           </div>

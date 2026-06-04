@@ -146,29 +146,6 @@ export default function BlogPage() {
       </section>
       </AnimateOnScroll>
 
-      {/* Newsletter */}
-      <AnimateOnScroll from="bottom" delay={0.05}>
-      <section className="py-16 bg-gradient-to-br from-slate-50 to-violet-50">
-        <div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-extrabold text-slate-800 mb-3">Recibe los mejores artículos</h2>
-          <p className="text-slate-500 text-sm mb-8">Una vez al mes, sin spam. Solo contenido útil para tu negocio.</p>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="tu@email.com"
-              className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="bg-gradient-to-r from-violet-500 to-pink-500 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-violet-200 transition-all whitespace-nowrap"
-            >
-              Suscribirme
-            </button>
-          </form>
-        </div>
-      </section>
-      </AnimateOnScroll>
-
       <Footer />
     </div>
   )
